@@ -3,7 +3,7 @@ server:
   bind_address: "0.0.0.0"
   advertised_ip: "127.0.0.1" # Used in ONVIF XAddrs and RTSP SDP; auto-detected if blank
   http_port: 8000
-  rtsp_port: 8554
+  rtsp_port: 8556
   tls_enabled: false # Generates ephemeral self-signed certificate on port 8443
   metrics_enabled: true
   log_level: "info"
@@ -20,8 +20,8 @@ auth:
   password: "password123"
 
 fleet:
-  enabled: false
-  count: 1 # Number of virtual cameras (cam0..camN)
+  enabled: true
+  count: 4 # Number of virtual cameras (cam0..camN)
 
 camera:
   manufacturer: "Simulated"

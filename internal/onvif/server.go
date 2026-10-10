@@ -194,8 +194,8 @@ func (s *Server) handleONVIF(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// 1. Snapshot endpoint: /onvif/snapshot or /onvif/{cam}/snapshot
-	if strings.HasSuffix(path, "/snapshot") {
+	// 1. Snapshot endpoint: /onvif/snapshot or /onvif/{cam}/snapshot (or GET /onvif/{cam}/device_service)
+	if strings.HasSuffix(path, "/snapshot") || (r.Method == http.MethodGet && strings.HasSuffix(path, "/device_service")) {
 		s.handleSnapshot(w, r, cam)
 		return
 	}

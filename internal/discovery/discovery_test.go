@@ -54,6 +54,7 @@ func setupTestServer(t *testing.T) (*Server, *fleet.Manager) {
 	cfg := config.DefaultConfig()
 	cfg.Server.AdvertisedIP = "192.168.1.100"
 	cfg.Server.HTTPPort = 8000
+	cfg.Server.RTSPPort = 18554
 	cfg.Camera.Model = "DrivewayCam"
 
 	hub := telemetry.NewHub(1)
