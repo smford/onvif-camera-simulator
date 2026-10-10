@@ -99,22 +99,92 @@ func Authenticate(authCfg config.AuthConfig, env *SOAPEnvelope) (bool, string) {
 	return false, "UNSUPPORTED_AUTH_TYPE"
 }
 
-// FormatSOAPFault creates a standard SOAP Fault response.
-func FormatSOAPFault(code, reason string) string {
+// FormatSOAPFault creates a standard SOAP 1.2 Fault response with subcode.
+func FormatSOAPFault(subcode, reason string) string {
+	topCode := "soap:Sender"
+	if strings.HasPrefix(subcode, "soap:Receiver") {
+		topCode = "soap:Receiver"
+	}
 	return fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-               xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+               xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+               xmlns:ter="http://www.onvif.org/ver10/error">
   <soap:Body>
     <soap:Fault>
       <soap:Code>
         <soap:Value>%s</soap:Value>
+        <soap:Subcode>
+          <soap:Value>%s</soap:Value>
+        </soap:Subcode>
       </soap:Code>
       <soap:Reason>
         <soap:Text xml:lang="en">%s</soap:Text>
       </soap:Reason>
     </soap:Fault>
   </soap:Body>
-</soap:Envelope>`, code, reason)
+</soap:Envelope>`, topCode, subcode, reason)
+}
+
+// FormatGetScopesResponse builds the device scopes list.
+func FormatGetScopesResponse(camCfg config.CameraConfig) string {
+	return fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:tds="http://www.onvif.org/ver10/device/wsdl"
+               xmlns:tt="http://www.onvif.org/ver10/schema">
+  <soap:Body>
+    <tds:GetScopesResponse>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/type/video_encoder</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/type/audio_encoder</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/type/ptz</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/Profile/Streaming</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/Profile/S</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/Profile/T</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/name/%s</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/hardware/%s</tt:ScopeItem>
+      </tds:Scopes>
+      <tds:Scopes>
+        <tt:ScopeDef>Fixed</tt:ScopeDef>
+        <tt:ScopeItem>onvif://www.onvif.org/location/Simulator</tt:ScopeItem>
+      </tds:Scopes>
+    </tds:GetScopesResponse>
+  </soap:Body>
+</soap:Envelope>`, camCfg.Model, camCfg.HardwareID)
+}
+
+// FormatSystemRebootResponse returns the SOAP payload for a reboot command.
+func FormatSystemRebootResponse() string {
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:tds="http://www.onvif.org/ver10/device/wsdl">
+  <soap:Body>
+    <tds:SystemRebootResponse>
+      <tds:Message>Rebooting in 1 second</tds:Message>
+    </tds:SystemRebootResponse>
+  </soap:Body>
+</soap:Envelope>`
 }
 
 // FormatGetSystemDateAndTimeResponse builds the clock synchronization response.

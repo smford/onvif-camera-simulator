@@ -100,3 +100,37 @@ func TestGetSystemDateAndTimeResponse(t *testing.T) {
 		t.Errorf("missing UTCDateTime element in response")
 	}
 }
+
+func TestGetScopesResponse(t *testing.T) {
+	cfg := config.CameraConfig{
+		Model:      "TestCam-4K",
+		HardwareID: "HW-REV-2",
+	}
+	resp := FormatGetScopesResponse(cfg)
+	if !strings.Contains(resp, "onvif://www.onvif.org/type/video_encoder") {
+		t.Errorf("missing video_encoder scope")
+	}
+	if !strings.Contains(resp, "onvif://www.onvif.org/Profile/S") {
+		t.Errorf("missing Profile/S scope")
+	}
+	if !strings.Contains(resp, "onvif://www.onvif.org/name/TestCam-4K") {
+		t.Errorf("missing model name scope")
+	}
+}
+
+func TestSystemRebootResponse(t *testing.T) {
+	resp := FormatSystemRebootResponse()
+	if !strings.Contains(resp, "<tds:SystemRebootResponse>") {
+		t.Errorf("missing SystemRebootResponse element")
+	}
+}
+
+func TestFormatSOAPFault(t *testing.T) {
+	fault := FormatSOAPFault("wsse:FailedAuthentication", "Auth error")
+	if !strings.Contains(fault, "<soap:Value>soap:Sender</soap:Value>") {
+		t.Errorf("expected soap:Sender in soap:Value, got %s", fault)
+	}
+	if !strings.Contains(fault, "<soap:Value>wsse:FailedAuthentication</soap:Value>") {
+		t.Errorf("expected wsse:FailedAuthentication in Subcode, got %s", fault)
+	}
+}

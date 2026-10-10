@@ -299,6 +299,20 @@ func (s *Server) dispatchSOAP(w http.ResponseWriter, r *http.Request, cam Camera
 		}
 		w.Write([]byte(FormatGetDeviceInformationResponse(camCfg)))
 		return
+	case strings.Contains(action, "GetScopes"):
+		camCfg := s.cfg.Camera
+		if cam != nil {
+			camCfg = cam.Config()
+		}
+		w.Write([]byte(FormatGetScopesResponse(camCfg)))
+		return
+	case strings.Contains(action, "SystemReboot"):
+		w.Write([]byte(FormatSystemRebootResponse()))
+		go func() {
+			time.Sleep(500 * time.Millisecond)
+			s.DropConnections(5 * time.Second)
+		}()
+		return
 	case strings.Contains(action, "GetCapabilities"):
 		w.Write([]byte(FormatGetCapabilitiesResponse(baseURL)))
 		return
@@ -331,12 +345,13 @@ func (s *Server) dispatchSOAP(w http.ResponseWriter, r *http.Request, cam Camera
 		return
 
 	// 2. Media Service
-	case strings.Contains(action, "GetProfiles"):
+	case strings.Contains(action, "GetProfiles") || strings.Contains(action, "GetProfile"):
 		w.Write([]byte(FormatGetProfilesResponse()))
 		return
 	case strings.Contains(action, "GetStreamUri"):
 		streamURL := rtspMain
-		if strings.Contains(string(bodyBytes), "profile_sub") {
+		lowerBody := strings.ToLower(string(bodyBytes))
+		if strings.Contains(lowerBody, "sub") {
 			streamURL = rtspSub
 		}
 		w.Write([]byte(FormatGetStreamUriResponse(streamURL)))
@@ -492,11 +507,25 @@ func extractSOAPAction(r *http.Request, body []byte) string {
 	if a := r.Header.Get("SOAPAction"); a != "" {
 		return strings.Trim(a, `"`)
 	}
+
+	// SOAP 1.2 action parameter in Content-Type header
+	ct := r.Header.Get("Content-Type")
+	if strings.Contains(ct, "action=") {
+		parts := strings.Split(ct, "action=")
+		if len(parts) > 1 {
+			actVal := strings.Trim(strings.Split(parts[1], ";")[0], `" `)
+			if actVal != "" {
+				subParts := strings.Split(actVal, "/")
+				return subParts[len(subParts)-1]
+			}
+		}
+	}
+
 	// Extract from Body XML tag
 	str := string(body)
 	for _, action := range []string{
-		"GetSystemDateAndTime", "GetDeviceInformation", "GetCapabilities", "GetServices",
-		"GetProfiles", "GetStreamUri", "GetSnapshotUri", "GetVideoEncoderConfigurationOptions",
+		"GetSystemDateAndTime", "GetDeviceInformation", "GetScopes", "SystemReboot", "GetCapabilities", "GetServices",
+		"GetProfiles", "GetProfile", "GetStreamUri", "GetSnapshotUri", "GetVideoEncoderConfigurationOptions",
 		"GetConfigurations", "GetNodes", "GetStatus", "ContinuousMove", "AbsoluteMove",
 		"RelativeMove", "Stop", "GetPresets", "SetPreset", "GotoPreset", "RemovePreset",
 		"GetEventProperties", "CreatePullPointSubscription", "PullMessages", "Renew", "Unsubscribe",

@@ -19,12 +19,13 @@ import (
 
 // Server implements WS-Discovery (UDP Multicast 239.255.255.250:3702).
 type Server struct {
-	cfg      *config.Config
-	fleetMgr *fleet.Manager
-	conn     *net.UDPConn
-	stopCh   chan struct{}
-	mu       sync.Mutex
-	running  bool
+	cfg       *config.Config
+	fleetMgr  *fleet.Manager
+	conn      *net.UDPConn
+	mcastAddr *net.UDPAddr
+	stopCh    chan struct{}
+	mu        sync.Mutex
+	running   bool
 }
 
 // NewServer initializes the WS-Discovery service.
@@ -140,10 +141,12 @@ func (s *Server) Start() error {
 	}
 
 	s.conn = udpConn
+	s.mcastAddr = mcastAddr
 	s.running = true
 	slog.Info("WS-Discovery service listening", "group", s.cfg.Discovery.MulticastAddress, "iface", s.cfg.Discovery.MulticastInterface)
 
 	go s.listenLoop()
+	go s.broadcastHello()
 	return nil
 }
 
@@ -153,6 +156,7 @@ func (s *Server) Stop() {
 	defer s.mu.Unlock()
 
 	if s.running {
+		s.broadcastBye()
 		s.running = false
 		close(s.stopCh)
 		if s.conn != nil {
@@ -308,4 +312,88 @@ func extractMessageID(reqXML string) string {
 		}
 	}
 	return ""
+}
+
+func (s *Server) broadcastHello() {
+	if s.conn == nil || s.mcastAddr == nil {
+		return
+	}
+	cams := s.fleetMgr.GetAllCameras()
+	scheme := "http"
+	if s.cfg.Server.TLSEnabled {
+		scheme = "https"
+	}
+	advIP := s.cfg.Server.AdvertisedIP
+	httpPort := s.cfg.Server.HTTPPort
+
+	for _, c := range cams {
+		xaddr := fmt.Sprintf("%s://%s:%d/onvif/device_service", scheme, advIP, httpPort)
+		if len(cams) > 1 {
+			xaddr = fmt.Sprintf("%s://%s:%d/onvif/%s/device_service", scheme, advIP, httpPort, c.ID())
+		}
+		camName := c.ID()
+		if c.Config().Model != "" {
+			camName = c.Config().Model
+		}
+
+		msgID := "urn:uuid:" + uuid.New().String()
+		scopes := fmt.Sprintf("onvif://www.onvif.org/type/video_encoder onvif://www.onvif.org/type/ptz onvif://www.onvif.org/Profile/Streaming onvif://www.onvif.org/Profile/S onvif://www.onvif.org/name/%s", camName)
+
+		helloXML := fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+               xmlns="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns:dn="http://www.onvif.org/ver10/network/wsdl"
+               xmlns:tds="http://www.onvif.org/ver10/device/wsdl">
+  <soap:Header>
+    <wsa:MessageID>%s</wsa:MessageID>
+    <wsa:To>urn:schemas-xmlsoap-org:ws:2005:04/discovery</wsa:To>
+    <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Hello</wsa:Action>
+  </soap:Header>
+  <soap:Body>
+    <Hello>
+      <EndpointReference>
+        <Address>urn:uuid:%s</Address>
+      </EndpointReference>
+      <Types>tds:Device dn:NetworkVideoTransmitter</Types>
+      <Scopes>%s</Scopes>
+      <XAddrs>%s</XAddrs>
+      <MetadataVersion>1</MetadataVersion>
+    </Hello>
+  </soap:Body>
+</soap:Envelope>`, msgID, c.UUID(), scopes, xaddr)
+
+		_, _ = s.conn.WriteTo([]byte(helloXML), s.mcastAddr)
+	}
+	slog.Debug("WS-Discovery multicast Hello broadcasted")
+}
+
+func (s *Server) broadcastBye() {
+	if s.conn == nil || s.mcastAddr == nil {
+		return
+	}
+	cams := s.fleetMgr.GetAllCameras()
+	for _, c := range cams {
+		msgID := "urn:uuid:" + uuid.New().String()
+		byeXML := fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+               xmlns="http://schemas.xmlsoap.org/ws/2005/04/discovery">
+  <soap:Header>
+    <wsa:MessageID>%s</wsa:MessageID>
+    <wsa:To>urn:schemas-xmlsoap-org:ws:2005:04/discovery</wsa:To>
+    <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Bye</wsa:Action>
+  </soap:Header>
+  <soap:Body>
+    <Bye>
+      <EndpointReference>
+        <Address>urn:uuid:%s</Address>
+      </EndpointReference>
+    </Bye>
+  </soap:Body>
+</soap:Envelope>`, msgID, c.UUID())
+
+		_, _ = s.conn.WriteTo([]byte(byeXML), s.mcastAddr)
+	}
+	slog.Debug("WS-Discovery multicast Bye broadcasted")
 }
