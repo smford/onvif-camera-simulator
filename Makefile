@@ -138,9 +138,9 @@ test: ## Run unit tests
 	$(GO) test -v ./...
 
 .PHONY: test-race
-test-race: ## Run unit tests with race detection (excludes ptz pkg due to mock race)
+test-race: ## Run unit tests with race detection
 	@echo "==> Running tests with race detector..."
-	$(GO) test -race -v $$(go list ./... | grep -v '/internal/ptz$$')
+	$(GO) test -race -v ./...
 
 .PHONY: cover
 cover: ## Run unit tests and calculate test coverage

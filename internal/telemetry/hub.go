@@ -1,6 +1,7 @@
 package telemetry
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -105,7 +106,7 @@ func NewHub(fleetSize int) *Hub {
 }
 
 func getCamName(idx int) string {
-	return "cam" + string(rune('0'+idx))
+	return fmt.Sprintf("cam%d", idx)
 }
 
 func (h *Hub) SetFleetSize(n int) {

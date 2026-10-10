@@ -44,3 +44,25 @@ func TestRingBufferLogHandler(t *testing.T) {
 		t.Errorf("expected 0 entries after Clear")
 	}
 }
+
+func TestHubFleetNaming(t *testing.T) {
+	hub := NewHub(16)
+	if hub.fleetSize != 16 {
+		t.Fatalf("expected fleetSize 16, got %d", hub.fleetSize)
+	}
+
+	for i := 0; i < 16; i++ {
+		expectedName := getCamName(i)
+		ptz := hub.GetPTZ(expectedName)
+		if ptz.MoveStatus != "IDLE" {
+			t.Errorf("expected IDLE status for camera %s, got %s", expectedName, ptz.MoveStatus)
+		}
+	}
+
+	if getCamName(10) != "cam10" {
+		t.Fatalf("expected cam10, got %s", getCamName(10))
+	}
+	if getCamName(25) != "cam25" {
+		t.Fatalf("expected cam25, got %s", getCamName(25))
+	}
+}

@@ -1,14 +1,15 @@
 package ptz
 
 import (
+	"sync/atomic"
 	"testing"
 	"time"
 )
 
 func TestVirtualPTZKinematics(t *testing.T) {
-	updated := false
+	var updated atomic.Bool
 	p := NewVirtualPTZ("cam0", 0, 0, 0, 1.0, 1.0, 1.0, func(pan, tilt, zoom float64, status, lastCmd string) {
-		updated = true
+		updated.Store(true)
 	})
 	defer p.Close()
 
@@ -39,7 +40,7 @@ func TestVirtualPTZKinematics(t *testing.T) {
 		t.Errorf("expected IDLE after Stop, got %s", status)
 	}
 
-	if !updated {
+	if !updated.Load() {
 		t.Errorf("expected onUpdate callback to have been invoked")
 	}
 }

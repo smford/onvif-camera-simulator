@@ -192,10 +192,12 @@ func (s *Server) handlePacket(packet []byte, srcAddr net.Addr) {
 		return
 	}
 
-	// Validate Requested Types: TDS device (tds:Device or wildcard if Types is empty/omitted)
+	// Validate Requested Types: TDS device or NetworkVideoTransmitter (or wildcard if Types is empty/omitted)
 	if strings.Contains(str, "Types>") {
 		typesContent := extractTagContent(str, "Types")
-		if typesContent != "" && !strings.Contains(typesContent, "tds:Device") && !strings.Contains(typesContent, "Device") {
+		if typesContent != "" &&
+			!strings.Contains(typesContent, "Device") &&
+			!strings.Contains(typesContent, "NetworkVideoTransmitter") {
 			return
 		}
 	}

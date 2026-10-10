@@ -93,6 +93,29 @@ func (s *Server) RegisterRoute(path, camera, streamType string, isMain bool, sou
 	return nil
 }
 
+// RegisterAlias maps an alternate mount path to an existing stream route.
+func (s *Server) RegisterAlias(aliasPath, targetPath string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	cleanTarget := normalizePath(targetPath)
+	route, ok := s.routes[cleanTarget]
+	if !ok {
+		return fmt.Errorf("target route not found for alias: %s", cleanTarget)
+	}
+
+	cleanAlias := normalizePath(aliasPath)
+	s.routes[cleanAlias] = &StreamRoute{
+		Path:         cleanAlias,
+		Camera:       route.Camera,
+		StreamType:   route.StreamType,
+		ServerStream: route.ServerStream,
+		Pipeline:     route.Pipeline,
+	}
+	slog.Info("RTSP mount point alias registered", "alias", cleanAlias, "target", cleanTarget)
+	return nil
+}
+
 // Start launches the RTSP server.
 func (s *Server) Start() error {
 	slog.Info("Starting RTSP server", "addr", s.server.RTSPAddress)
@@ -104,9 +127,21 @@ func (s *Server) Close() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	closedPipelines := make(map[*media.Pipeline]struct{})
+	closedStreams := make(map[*gortsplib.ServerStream]struct{})
 	for _, r := range s.routes {
-		r.Pipeline.Stop()
-		r.ServerStream.Close()
+		if r.Pipeline != nil {
+			if _, ok := closedPipelines[r.Pipeline]; !ok {
+				r.Pipeline.Stop()
+				closedPipelines[r.Pipeline] = struct{}{}
+			}
+		}
+		if r.ServerStream != nil {
+			if _, ok := closedStreams[r.ServerStream]; !ok {
+				r.ServerStream.Close()
+				closedStreams[r.ServerStream] = struct{}{}
+			}
+		}
 	}
 	s.server.Close()
 }

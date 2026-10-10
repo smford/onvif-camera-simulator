@@ -157,24 +157,8 @@ func (m *Manager) InitializeFleet(count int) error {
 
 		// If single-camera fleet or cam0, also alias default paths /live/main and /live/sub
 		if i == 0 {
-			_ = m.rtspServer.RegisterRoute(
-				"/live/main",
-				camID,
-				"main",
-				true,
-				m.cfg.Streams.Main.SourceFile,
-				m.cfg.Streams.Main.FPS,
-				m.cfg.Streams.Main.AudioEnabled,
-			)
-			_ = m.rtspServer.RegisterRoute(
-				"/live/sub",
-				camID,
-				"sub",
-				false,
-				m.cfg.Streams.Sub.SourceFile,
-				m.cfg.Streams.Sub.FPS,
-				m.cfg.Streams.Sub.AudioEnabled,
-			)
+			_ = m.rtspServer.RegisterAlias("/live/main", mainFleetPath)
+			_ = m.rtspServer.RegisterAlias("/live/sub", subFleetPath)
 		}
 	}
 

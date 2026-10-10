@@ -165,8 +165,15 @@ func TestHandlePacketMatching(t *testing.T) {
 	// Other device type should be ignored
 	otherTypeProbe := strings.Replace(validProbe, "tds:Device", "dn:Printer", 1)
 	otherTypes := extractTagContent(otherTypeProbe, "Types")
-	if strings.Contains(otherTypes, "tds:Device") || strings.Contains(otherTypes, "Device") {
-		t.Fatal("should not match tds:Device")
+	if strings.Contains(otherTypes, "tds:Device") || strings.Contains(otherTypes, "Device") || strings.Contains(otherTypes, "NetworkVideoTransmitter") {
+		t.Fatal("dn:Printer should not match Device or NetworkVideoTransmitter")
+	}
+
+	// NetworkVideoTransmitter type should match
+	nvtProbe := strings.Replace(validProbe, "tds:Device", "dn:NetworkVideoTransmitter", 1)
+	nvtTypes := extractTagContent(nvtProbe, "Types")
+	if !strings.Contains(nvtTypes, "NetworkVideoTransmitter") {
+		t.Fatalf("expected NetworkVideoTransmitter in Types, got %q", nvtTypes)
 	}
 }
 
