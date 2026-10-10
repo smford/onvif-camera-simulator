@@ -100,8 +100,43 @@ func (s *Server) Start() error {
 
 	udpConn := packetConn.(*net.UDPConn)
 	pConn := ipv4.NewPacketConn(udpConn)
-	if err := pConn.JoinGroup(iface, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
-		slog.Warn("Failed to join multicast group (multicast reception may be limited)", "err", err)
+	if iface != nil {
+		if err := pConn.JoinGroup(iface, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
+			slog.Warn("Failed to join multicast group", "interface", iface.Name, "err", err)
+		}
+	} else {
+		// On macOS/Darwin, JoinGroup(nil) returns EADDRNOTAVAIL ("can't assign requested address").
+		// Enumerate all active multicast-capable IPv4 interfaces and join each one.
+		joined := 0
+		if ifaces, err := net.Interfaces(); err == nil {
+			for _, ifi := range ifaces {
+				if ifi.Flags&net.FlagUp == 0 || ifi.Flags&net.FlagMulticast == 0 {
+					continue
+				}
+				addrs, err := ifi.Addrs()
+				if err != nil {
+					continue
+				}
+				hasIPv4 := false
+				for _, addr := range addrs {
+					if ipNet, ok := addr.(*net.IPNet); ok && ipNet.IP.To4() != nil {
+						hasIPv4 = true
+						break
+					}
+				}
+				if !hasIPv4 {
+					continue
+				}
+				if err := pConn.JoinGroup(&ifi, &net.UDPAddr{IP: mcastAddr.IP}); err == nil {
+					joined++
+				}
+			}
+		}
+		if joined == 0 {
+			if err := pConn.JoinGroup(nil, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
+				slog.Warn("Failed to join multicast group (multicast reception may be limited)", "err", err)
+			}
+		}
 	}
 
 	s.conn = udpConn
