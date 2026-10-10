@@ -22,13 +22,13 @@
   <!-- Left Side: Protocols / Transports -->
   <g transform="translate(40, 40)">
     <text x="0" y="24" class="title" font-size="20">Network Transports</text>
-    <text x="0" y="44" class="text">100% Pure Go &bull; Zero External Cgo / FFmpeg</text>
+    <text x="0" y="44" class="text">100% Pure Go &#8226; Zero External Cgo / FFmpeg</text>
 
     <!-- Box 1: ONVIF SOAP 1.2 -->
     <g transform="translate(0, 65)">
       <rect width="260" height="95" rx="10" fill="url(#coreGrad)" stroke="#38bdf8" stroke-width="1.5"/>
       <text x="16" y="28" class="box-title">HTTP &amp; ONVIF SOAP 1.2</text>
-      <text x="16" y="50" class="text-light">Port 8000 &bull; Profile S / T / M</text>
+      <text x="16" y="50" class="text-light">Port 8000 &#8226; Profile S / T / M</text>
       <text x="16" y="72" class="text">Device, Media, PTZ, Events</text>
       <rect x="180" y="14" width="65" height="18" rx="4" fill="#0284c7" fill-opacity="0.3"/>
       <text x="212" y="27" text-anchor="middle" class="pill" fill="#38bdf8">REST API</text>
@@ -38,7 +38,7 @@
     <g transform="translate(0, 180)">
       <rect width="260" height="95" rx="10" fill="url(#coreGrad)" stroke="#818cf8" stroke-width="1.5"/>
       <text x="16" y="28" class="box-title">Dual-Stream RTSP / RTP</text>
-      <text x="16" y="50" class="text-light">Port 8554 &bull; TCP / UDP</text>
+      <text x="16" y="50" class="text-light">Port 8554 &#8226; TCP / UDP</text>
       <text x="16" y="72" class="text">1080p Main &amp; 360p Sub H.264</text>
       <rect x="180" y="14" width="65" height="18" rx="4" fill="#4f46e5" fill-opacity="0.3"/>
       <text x="212" y="27" text-anchor="middle" class="pill" fill="#a78bfa">H.264</text>
@@ -97,7 +97,7 @@
     <g transform="translate(0, 65)">
       <rect width="250" height="75" rx="10" fill="url(#coreGrad)" stroke="#f59e0b" stroke-width="1.5"/>
       <text x="16" y="26" class="box-title">Frigate NVR</text>
-      <text x="16" y="46" class="text-light">Detect: 360p sub &bull; Record: 1080p</text>
+      <text x="16" y="46" class="text-light">Detect: 360p sub &#8226; Record: 1080p</text>
       <text x="16" y="62" class="text">go2rtc WebRTC restreaming</text>
     </g>
 

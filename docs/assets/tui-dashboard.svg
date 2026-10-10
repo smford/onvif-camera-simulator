@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 740" width="1120" height="740">
   <defs>
     <style>
-      .tui { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size: 13px; line-height: 1.45; fill: #e2e8f0; }
+      .tui { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 13px; font-variant-ligatures: none; fill: #e2e8f0; }
       .dim { fill: #94a3b8; }
       .dark-dim { fill: #64748b; }
       .cyan { fill: #38bdf8; font-weight: 700; }

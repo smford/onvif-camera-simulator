@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
   <defs>
     <style>
-      .hud-mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 15px; fill: #ffffff; letter-spacing: 0.04em; }
-      .hud-label { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; font-weight: 700; }
+      .hud-mono { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace; font-variant-ligatures: none; font-size: 15px; fill: #ffffff; letter-spacing: 0.04em; }
+      .hud-label { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace; font-variant-ligatures: none; font-size: 13px; font-weight: 700; }
     </style>
   </defs>
 
