@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONVIF & RTSP Camera Simulator &bull; Pure Go Standalone Mock Engine</title>
+  <meta name="description" content="Production-ready ONVIF Profile S/T/M and RTSP Camera Simulator in 100% pure Go. Zero Cgo, dual stream, WebRTC go2rtc compatibility, virtual PTZ, dynamic snapshots, fleet scaling, and SRE chaos injection.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-card: rgba(18, 24, 38, 0.7);
+      --bg-card-hover: rgba(26, 34, 54, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --accent-purple: #818cf8;
+      --accent-green: #34d399;
+      --accent-amber: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 65%, rgba(129, 140, 248, 0.07) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Top Announcement Banner */
+    .top-banner {
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(15, 23, 42, 0.95) 50%, rgba(56, 189, 248, 0.2) 100%);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 0.5rem 1.5rem;
+      font-size: 0.875rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      backdrop-filter: blur(10px);
+    }
+
+    .top-banner .release-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(56, 189, 248, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+      padding: 0.15rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .top-banner a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+
+    .top-banner a:hover {
+      color: #fff;
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 37px;
+      z-index: 50;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-purple) 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .brand-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .btn-github {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-main) !important;
+      transition: all 0.2s ease;
+    }
+
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 5rem 2rem 3rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--border-accent);
+      color: var(--accent);
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin: 0 auto 2.5rem auto;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn {
+      padding: 0.8rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b1120;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Terminal Quickstart Box */
+    .terminal-box {
+      max-width: 850px;
+      margin: 0 auto 4rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      text-align: left;
+    }
+
+    .terminal-header {
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .terminal-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .terminal-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.925rem;
+      color: #e2e8f0;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .prompt {
+      color: var(--accent);
+      user-select: none;
+    }
+
+    .comment {
+      color: #64748b;
+    }
+
+    /* Feature Grid */
+    .section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 700px;
+      margin: 0 auto 3rem auto;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.75rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-3px);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 1.25rem;
+    }
+
+    .icon-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .icon-purple { background: rgba(129, 140, 248, 0.15); color: var(--accent-purple); }
+    .icon-green { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); }
+    .icon-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); }
+
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    /* Tabs / Code Showcase */
+    .showcase {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .showcase-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.9rem 1.4rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      background: var(--code-bg);
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Badges list */
+    .meta-badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .meta-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 5rem;
+      background: rgba(10, 14, 23, 0.95);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        top: 45px;
+      }
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .hero {
+        padding: 3rem 1rem 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Banner -->
+  <div class="top-banner">
+    <span class="release-tag">Latest Release</span>
+    <span><strong>v0.1.0</strong> is now available via Homebrew, GitHub releases, and Docker!</span>
+    <a href="https://github.com/smford/onvif-camera-simulator/releases/tag/v0.1.0" target="_blank" rel="noopener">Release Notes &rarr;</a>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+        </svg>
+      </div>
+      <span>onvif-camera-simulator</span>
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#installation">Install</a>
+      <a href="#endpoints">Endpoints</a>
+      <a href="#chaos">SRE Chaos</a>
+      <a href="https://github.com/smford/onvif-camera-simulator" class="btn-github" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        GitHub
+      </a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>✨ 100% Pure Go &bull; Zero Cgo &bull; Zero FFmpeg</span>
+    </div>
+    <h1>ONVIF & RTSP Camera Simulator</h1>
+    <p>A high-performance mock camera platform for SREs, QA pipelines, and NVR developers testing Frigate, Home Assistant, Milestone, and Synology Surveillance.</p>
+
+    <div class="meta-badges">
+      <span class="meta-badge">ONVIF Profile S/T/M</span>
+      <span class="meta-badge">Dual RTSP Stream</span>
+      <span class="meta-badge">WS-Discovery 3702/UDP</span>
+      <span class="meta-badge">Virtual PTZ Kinematics</span>
+      <span class="meta-badge">Pull-Point Events</span>
+      <span class="meta-badge">Multi-Camera Fleet</span>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#installation" class="btn btn-primary">Get Started</a>
+      <a href="https://github.com/smford/onvif-camera-simulator" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+
+    <!-- Quick Terminal Install -->
+    <div class="terminal-box" id="installation">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <div class="terminal-dot dot-red"></div>
+          <div class="terminal-dot dot-yellow"></div>
+          <div class="terminal-dot dot-green"></div>
+        </div>
+        <div class="terminal-title">quickstart.sh</div>
+      </div>
+      <div class="terminal-body">
+        <span class="comment"># Install via Homebrew Tap</span><br>
+        <span class="prompt">$</span> brew tap smford/tap<br>
+        <span class="prompt">$</span> brew install onvif-camera-simulator<br><br>
+        <span class="comment"># Run interactive TUI simulator</span><br>
+        <span class="prompt">$</span> onvif-camera-simulator<br><br>
+        <span class="comment"># Or run 4 cameras headless in background</span><br>
+        <span class="prompt">$</span> onvif-camera-simulator --no-tui --fleet 4
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="section" id="features">
+    <h2 class="section-title">Architected for NVR Stress Testing</h2>
+    <p class="section-subtitle">Everything needed to test streaming reliability, auto-discovery, PTZ movement, and AI event ingest under realistic conditions.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon icon-blue">🎥</div>
+        <h3>Pure Go Dual RTSP</h3>
+        <p>Built directly on <code>gortsplib/v4</code> and <code>mediacommon</code>. Emits synchronized 1080p Main and 360p Sub H.264 video with Constrained Baseline Profiles (<code>profile-level-id=42e01f</code>) for instant browser/WebRTC playback.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-purple">🕹️</div>
+        <h3>Virtual PTZ Kinematics</h3>
+        <p>Real-time 20Hz continuous and absolute move motor simulation with acceleration clamping, velocity timeouts, and persistent preset coordination.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-green">🔔</div>
+        <h3>WS-BaseNotification Events</h3>
+        <p>Pull-point event queue delivering cell motion (Profile S), AI person detection with normalized bounding boxes (Profile T/M), and vehicle detection to subscribed NVRs.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-amber">⚡</div>
+        <h3>SRE Chaos Engineering</h3>
+        <p>Simulate production camera faults on-demand: stream freeze (holding RTSP TCP sockets without packet emission), connection drop / hardware reboot, and packet loss.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-blue">🌐</div>
+        <h3>WS-Discovery Multicast</h3>
+        <p>Automatic device discovery on <code>239.255.255.250:3702</code> with Probe, ProbeMatch, Hello, and Bye notifications across single and fleet camera topologies.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon icon-purple">📊</div>
+        <h3>Interactive TUI & Observability</h3>
+        <p>Full Charm Bubble Tea dashboard with live telemetry, form config tuning, event log ring buffer, and Prometheus <code>/metrics</code> scraping.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Code Showcase & Usage -->
+  <section class="section" id="endpoints">
+    <h2 class="section-title">Configuration & REST APIs</h2>
+    <p class="section-subtitle">Flexible configuration and programmatic control for automated integration testing.</p>
+
+    <div class="showcase">
+      <div class="showcase-tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'tab-docker')">Docker Compose</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-fleet')">Fleet Mode</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-rest')">REST API & Chaos</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-onvif')">ONVIF Endpoints</button>
+      </div>
+
+      <div id="tab-docker" class="tab-content active">
+<span class="comment"># docker-compose.yml</span>
+services:
+  onvif-simulator:
+    image: ghcr.io/smford/onvif-camera-simulator:latest
+    network_mode: host
+    restart: unless-stopped
+    command: ["--no-tui", "--config", "/app/config.yaml"]
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      </div>
+
+      <div id="tab-fleet" class="tab-content">
+<span class="comment"># Launch a fleet of 8 simulated cameras</span>
+<span class="prompt">$</span> onvif-camera-simulator --fleet 8 --no-tui
+
+<span class="comment"># Each camera is cleanly namespaced across shared ports:</span>
+RTSP Stream 0:  rtsp://127.0.0.1:8554/live/cam0/main
+RTSP Stream 1:  rtsp://127.0.0.1:8554/live/cam1/main
+ONVIF Service:  http://127.0.0.1:8000/onvif/cam0/device_service
+Dynamic JPEG:   http://127.0.0.1:8000/onvif/cam0/snapshot
+      </div>
+
+      <div id="tab-rest" class="tab-content">
+<span class="comment"># Trigger Cell Motion event via REST</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/events/trigger \
+    -H "Content-Type: application/json" \
+    -d '{"topic":"motion", "state":true}'
+
+<span class="comment"># Inject 10s Simulated Reboot Chaos</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/inject \
+    -H "Content-Type: application/json" \
+    -d '{"type":"reboot", "duration":"10s"}'
+
+<span class="comment"># Query active cameras and status</span>
+<span class="prompt">$</span> curl http://127.0.0.1:8000/api/cameras
+      </div>
+
+      <div id="tab-onvif" class="tab-content">
+<span class="comment"># ONVIF SOAP 1.2 Endpoints:</span>
+Device Service:  http://127.0.0.1:8000/onvif/device_service
+Media Service:   http://127.0.0.1:8000/onvif/media_service
+PTZ Service:     http://127.0.0.1:8000/onvif/ptz_service
+Event Service:   http://127.0.0.1:8000/onvif/event_service
+Dynamic JPEG:    http://127.0.0.1:8000/onvif/snapshot
+Health Check:    http://127.0.0.1:8000/healthz
+Prometheus:      http://127.0.0.1:8000/metrics
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>Released under the <a href="https://github.com/smford/onvif-camera-simulator/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> &bull; Created by <a href="https://github.com/smford" target="_blank" rel="noopener">Simon Ford</a></p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;">Homebrew Tap: <code>brew install smford/tap/onvif-camera-simulator</code></p>
+  </footer>
+
+  <script>
+    function switchTab(evt, tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(b => b.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+  </script>
+</body>
+</html>

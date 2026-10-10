@@ -93,3 +93,12 @@ jobs:
           else
             echo "::warning::HOMEBREW_TAP_GITHUB_TOKEN secret is not set. Formula available in release assets."
           fi
+
+      - name: Trigger GitHub Pages Deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.formula.outputs.tag }}
+        run: |
+          echo "Triggering GitHub Pages deployment for ${TAG_NAME}..."
+          gh workflow run pages.yml -f version="${TAG_NAME}" || true
+
