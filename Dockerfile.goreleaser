@@ -1,4 +1,4 @@
-FROM alpine:3.21
+FROM alpine:3.24
 
 # Install CA certificates and tzdata for time synchronization
 RUN apk add --no-cache ca-certificates tzdata
