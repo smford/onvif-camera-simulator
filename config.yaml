@@ -1,0 +1,64 @@
+# ONVIF & RTSP Camera Simulator Configuration
+server:
+  bind_address: "0.0.0.0"
+  advertised_ip: "127.0.0.1" # Used in ONVIF XAddrs and RTSP SDP; auto-detected if blank
+  http_port: 8000
+  rtsp_port: 8554
+  tls_enabled: false # Generates ephemeral self-signed certificate on port 8443
+  metrics_enabled: true
+  log_level: "info"
+  log_format: "text" # "text" or "json" (used when headless)
+
+discovery:
+  enabled: true
+  multicast_interface: "" # e.g., "eth0", "en0"; blank uses default route
+  multicast_address: "239.255.255.250:3702"
+
+auth:
+  enabled: false
+  username: "admin"
+  password: "password123"
+
+fleet:
+  enabled: false
+  count: 1 # Number of virtual cameras (cam0..camN)
+
+camera:
+  manufacturer: "Simulated"
+  model: "ONVIF-Go-SRE-Enterprise"
+  firmware: "1.0.0"
+  serial_number: "SIM-GO-005"
+  hardware_id: "REV-5"
+
+ptz:
+  enabled: true
+  max_pan_speed: 1.0
+  max_tilt_speed: 1.0
+  max_zoom_speed: 1.0
+  home_pan: 0.0
+  home_tilt: 0.0
+  home_zoom: 0.0
+
+events:
+  enabled: true
+  chaos_mode: false
+  chaos_interval_seconds: 30
+  default_event_duration_seconds: 5
+
+streams:
+  main:
+    path: "/live/main"
+    width: 1920
+    height: 1080
+    fps: 20
+    bitrate_kbps: 4096
+    audio_enabled: true
+    source_file: "" # Empty uses embedded synthetic stream
+  sub:
+    path: "/live/sub"
+    width: 640
+    height: 360
+    fps: 10
+    bitrate_kbps: 512
+    audio_enabled: true
+    source_file: "" # Empty uses embedded synthetic stream
