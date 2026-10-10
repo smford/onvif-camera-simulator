@@ -1,0 +1,9 @@
+# OWASP ZAP baseline scan rules configuration for onvif-camera-simulator API
+# Format: <rule-id>\t<threshold>\t<comment>
+10020	INFO	(Anti-clickjacking Header - not applicable for headless SOAP/JSON/streaming API)
+10038	INFO	(Content Security Policy (CSP) Header Not Set - API endpoints do not serve HTML)
+10021	INFO	(X-Content-Type-Options Header Missing)
+10035	INFO	(Strict-Transport-Security Header Not Set - plain HTTP local container test)
+10015	INFO	(Incomplete or No Cache-control Header Set)
+10036	INFO	(Server Leaks Version Information via "Server" HTTP Response Header)
+10096	INFO	(Timestamp Disclosure)

@@ -1,46 +1,88 @@
-name: Deploy GitHub Pages Documentation
+name: Deploy GitHub Pages
 
 on:
   push:
     branches:
       - main
     paths:
-      - "docs/**"
-      - ".github/workflows/pages.yml"
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
+      - 'scripts/update-docs-version.sh'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version being published"
+        description: 'Version tag to deploy (e.g. v0.1.0)'
         required: false
-        default: ""
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag to deploy (e.g. v0.1.0)'
+        required: false
+        type: string
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
   deploy:
+    name: Sync Version & Deploy Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          path: "docs"
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync documentation version
+        run: |
+          TARGET_TAG="${{ inputs.version || github.event.release.tag_name || github.event.inputs.version }}"
+          if [ -z "$TARGET_TAG" ]; then
+            git fetch --tags --force
+            TARGET_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+          fi
+
+          if [ -n "$TARGET_TAG" ]; then
+            echo "Synchronizing documentation with release: $TARGET_TAG"
+            chmod +x ./scripts/update-docs-version.sh
+            ./scripts/update-docs-version.sh "$TARGET_TAG" "docs/index.html"
+
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add docs/index.html
+            if ! git diff --staged --quiet; then
+              echo "Committing updated docs/index.html ($TARGET_TAG) to main..."
+              git commit -m "chore(docs): sync release version to ${TARGET_TAG} [skip ci]"
+              git pull --rebase origin main || true
+              git push origin main
+            else
+              echo "docs/index.html is already up-to-date with $TARGET_TAG."
+            fi
+          else
+            echo "Warning: No release tag found; deploying docs as-is."
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: './docs'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

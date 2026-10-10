@@ -1,0 +1,125 @@
+name: Dependabot Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  dependabot-release:
+    name: Build & Publish Dependabot Release
+    runs-on: ubuntu-latest
+    if: |
+      github.actor == 'dependabot[bot]' ||
+      github.event.head_commit.author.username == 'dependabot[bot]' ||
+      contains(github.event.head_commit.author.email, 'dependabot[bot]') ||
+      (startsWith(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'dependabot/'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Calculate Next Patch Version
+        id: next_version
+        run: |
+          git fetch --tags
+          latest=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          v=${latest#v}
+          major=$(echo $v | cut -d. -f1)
+          minor=$(echo $v | cut -d. -f2)
+          patch=$(echo $v | cut -d. -f3)
+          next="v${major}.${minor}.$((patch + 1))"
+          echo "tag=$next" >> "$GITHUB_OUTPUT"
+          echo "Calculated next release tag: $next"
+
+      - name: Create and Push Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          tag="${{ steps.next_version.outputs.tag }}"
+          git tag -a "$tag" -m "Release $tag: Automated dependabot update"
+          git push origin "$tag"
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Homebrew Formula
+        id: formula
+        run: |
+          TAG_NAME="${{ steps.next_version.outputs.tag }}"
+          VERSION="${TAG_NAME#v}"
+          echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          chmod +x scripts/generate_formula.sh
+          ./scripts/generate_formula.sh "$VERSION" "$TAG_NAME" "dist" "dist/onvif-camera-simulator.rb"
+
+      - name: Upload Formula to Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.next_version.outputs.tag }}
+        run: |
+          gh release upload "$TAG_NAME" dist/onvif-camera-simulator.rb --clobber
+
+      - name: Publish Homebrew Formula to Tap
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.next_version.outputs.tag }}
+        run: |
+          if [ -n "${TAP_TOKEN}" ]; then
+            echo "Publishing updated formula to smford/homebrew-tap..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git clone "https://x-access-token:${TAP_TOKEN}@github.com/smford/homebrew-tap.git" tap_repo
+            mkdir -p tap_repo/Formula
+            cp dist/onvif-camera-simulator.rb tap_repo/Formula/onvif-camera-simulator.rb
+            cd tap_repo
+            git add Formula/onvif-camera-simulator.rb
+            if git commit -m "feat(formula): update onvif-camera-simulator to ${TAG_NAME}"; then
+              git push origin main
+              echo "Successfully pushed formula update to smford/homebrew-tap"
+            else
+              echo "Formula in tap is already up to date"
+            fi
+            cd ..
+            rm -rf tap_repo
+          else
+            echo "::warning::HOMEBREW_TAP_GITHUB_TOKEN secret is not set. Formula available in release assets."
+          fi
+
+      - name: Trigger GitHub Pages Deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.next_version.outputs.tag }}
+        run: |
+          echo "Triggering GitHub Pages deployment for ${TAG_NAME}..."
+          gh workflow run pages.yml -f version="${TAG_NAME}" || true

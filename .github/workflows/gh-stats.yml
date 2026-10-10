@@ -1,0 +1,58 @@
+name: GitHub Stats
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1' # Weekly Monday midnight run
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-stats:
+    name: SRE PR Quality Gate & Stats
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Run gh-stats Action
+        uses: smford/gh-stats@2a54880d552da012a17d0b4e58d8d3ce9d643942 # v0.11.3
+        with:
+          target: pr
+          output: gh-stats-pr.sarif
+          upload-sarif: 'true'
+          category: 'gh-stats-pr'
+          comment-pr: 'true'
+          fail-on: 'CRITICAL'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  repo-stats:
+    name: Repo SRE Health & Hotspots
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Run gh-stats Action
+        uses: smford/gh-stats@2a54880d552da012a17d0b4e58d8d3ce9d643942 # v0.11.3
+        with:
+          target: repo
+          commit-limit: '250'
+          output: repo-stats.sarif
+          upload-sarif: 'true'
+          category: 'gh-stats-repo'
+          token: ${{ secrets.GITHUB_TOKEN }}

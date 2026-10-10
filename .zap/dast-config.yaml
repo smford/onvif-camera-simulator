@@ -1,0 +1,23 @@
+server:
+  host: "0.0.0.0"
+  http_port: 8000
+  rtsp_port: 8554
+  advertised_ip: "127.0.0.1"
+  log_level: "info"
+  log_format: "text"
+
+auth:
+  enabled: false
+
+fleet:
+  enabled: false
+  count: 1
+
+discovery:
+  enabled: false
+
+ptz:
+  enabled: true
+
+chaos:
+  enabled: true
