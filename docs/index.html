@@ -7,12 +7,12 @@
   <meta name="description" content="Production-ready ONVIF Profile S/T/M and RTSP Camera Simulator in 100% pure Go. Zero Cgo, dual stream, WebRTC go2rtc compatibility, virtual PTZ, dynamic snapshots, fleet scaling, and SRE chaos injection.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #0a0e17;
-      --bg-card: rgba(18, 24, 38, 0.7);
-      --bg-card-hover: rgba(26, 34, 54, 0.85);
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(26, 34, 54, 0.9);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-accent: rgba(56, 189, 248, 0.3);
       --accent: #38bdf8;
@@ -20,9 +20,10 @@
       --accent-purple: #818cf8;
       --accent-green: #34d399;
       --accent-amber: #fbbf24;
+      --accent-red: #f87171;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --code-bg: #0f172a;
+      --code-bg: #090d16;
     }
 
     * {
@@ -47,7 +48,7 @@
     .top-banner {
       background: linear-gradient(90deg, rgba(30, 58, 138, 0.9) 0%, rgba(15, 23, 42, 0.95) 50%, rgba(56, 189, 248, 0.2) 100%);
       border-bottom: 1px solid rgba(56, 189, 248, 0.25);
-      padding: 0.5rem 1.5rem;
+      padding: 0.55rem 1.5rem;
       font-size: 0.875rem;
       display: flex;
       justify-content: center;
@@ -57,7 +58,8 @@
       position: sticky;
       top: 0;
       z-index: 60;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .top-banner .release-tag {
@@ -90,7 +92,7 @@
     /* Header & Navigation */
     header {
       position: sticky;
-      top: 37px;
+      top: 41px;
       z-index: 50;
       background: rgba(10, 14, 23, 0.85);
       backdrop-filter: blur(12px);
@@ -131,7 +133,7 @@
 
     nav {
       display: flex;
-      gap: 1.5rem;
+      gap: 1.25rem;
       align-items: center;
     }
 
@@ -166,7 +168,7 @@
 
     /* Hero Section */
     .hero {
-      padding: 5rem 2rem 3rem 2rem;
+      padding: 4.5rem 2rem 2.5rem 2rem;
       max-width: 1200px;
       margin: 0 auto;
       text-align: center;
@@ -187,7 +189,7 @@
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-size: clamp(2.4rem, 5vw, 4rem);
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.02em;
@@ -200,8 +202,8 @@
     .hero p {
       font-size: 1.25rem;
       color: var(--text-muted);
-      max-width: 820px;
-      margin: 0 auto 2.5rem auto;
+      max-width: 840px;
+      margin: 0 auto 2.25rem auto;
     }
 
     .hero-actions {
@@ -209,7 +211,7 @@
       justify-content: center;
       gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 3.5rem;
+      margin-bottom: 2.5rem;
     }
 
     .btn {
@@ -247,55 +249,212 @@
       border-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* Terminal Quickstart Box */
-    .terminal-box {
-      max-width: 850px;
-      margin: 0 auto 4rem auto;
-      background: var(--code-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      text-align: left;
+    .meta-badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
-    .terminal-header {
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem 1rem;
+    .meta-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+    }
+
+    /* Sections */
+    .section {
+      padding: 4.5rem 2rem;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 750px;
+      margin: 0 auto;
+    }
+
+    /* Screenshots & Visual Showcase */
+    .screenshots-container {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    .screenshot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s ease;
+    }
+
+    .screenshot-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .screenshot-desc {
+      padding: 1.5rem 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .screenshot-desc h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.5rem;
     }
 
-    .terminal-dots {
-      display: flex;
-      gap: 0.4rem;
-    }
-
-    .terminal-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-    }
-
-    .dot-red { background: #ef4444; }
-    .dot-yellow { background: #f59e0b; }
-    .dot-green { background: #10b981; }
-
-    .terminal-title {
-      font-size: 0.8rem;
+    .screenshot-desc p {
       color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      max-width: 700px;
     }
 
-    .terminal-body {
-      padding: 1.25rem 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.925rem;
-      color: #e2e8f0;
-      line-height: 1.7;
+    .screenshot-media {
+      padding: 1rem;
+      background: #060911;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .screenshot-media img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+    }
+
+    /* Installation & Platform Tabs */
+    .tabs-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .tabs-header {
+      display: flex;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
       overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs-header::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 2rem;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .code-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .code-box pre {
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: #e2e8f0;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
     }
 
     .prompt {
@@ -307,29 +466,36 @@
       color: #64748b;
     }
 
+    .cmd-out {
+      color: #34d399;
+    }
+
+    /* Platform Subgrid */
+    .distro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .distro-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .distro-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     /* Feature Grid */
-    .section {
-      padding: 4rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 2.25rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      letter-spacing: -0.01em;
-    }
-
-    .section-subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 1.15rem;
-      max-width: 700px;
-      margin: 0 auto 3rem auto;
-    }
-
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -379,73 +545,36 @@
       line-height: 1.55;
     }
 
-    /* Tabs / Code Showcase */
-    .showcase {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-top: 2rem;
+    /* Hotkey Table */
+    .key-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
     }
 
-    .showcase-tabs {
-      display: flex;
-      background: rgba(255, 255, 255, 0.02);
+    .key-table th, .key-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
       border-bottom: 1px solid var(--border-color);
-      overflow-x: auto;
     }
 
-    .tab-btn {
-      padding: 0.9rem 1.4rem;
-      background: transparent;
-      border: none;
+    .key-table th {
+      background: rgba(255, 255, 255, 0.02);
       color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-      background: rgba(56, 189, 248, 0.04);
-    }
-
-    .tab-content {
-      display: none;
-      padding: 1.5rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      color: #e2e8f0;
-      background: var(--code-bg);
-      line-height: 1.6;
-      overflow-x: auto;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Badges list */
-    .meta-badges {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-
-    .meta-badge {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
       font-size: 0.8rem;
+    }
+
+    kbd {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
       font-family: 'JetBrains Mono', monospace;
-      color: #94a3b8;
+      font-size: 0.8rem;
+      color: var(--accent);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     /* Footer */
@@ -481,6 +610,10 @@
       .hero {
         padding: 3rem 1rem 2rem 1rem;
       }
+      .screenshot-desc {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -489,8 +622,8 @@
   <!-- Top Announcement Banner -->
   <div class="top-banner">
     <span class="release-tag">Latest Release</span>
-    <span><strong><span id="release-version">v0.1.0</span></strong> is now available via Homebrew, GitHub releases, and Docker!</span>
-    <a href="https://github.com/smford/onvif-camera-simulator/releases/tag/v0.1.0" target="_blank" rel="noopener">Release Notes &rarr;</a>
+    <span><strong><span id="release-version">v0.2.0</span></strong> is now available via Homebrew, GitHub releases, APT/DNF, and Docker!</span>
+    <a id="release-notes-link" href="https://github.com/smford/onvif-camera-simulator/releases/tag/v0.2.0" target="_blank" rel="noopener">Release Notes &rarr;</a>
   </div>
 
   <!-- Header -->
@@ -504,10 +637,11 @@
       <span>onvif-camera-simulator</span>
     </a>
     <nav>
+      <a href="#screenshots">Screenshots</a>
+      <a href="#installation">Installation</a>
+      <a href="#usage">Usage & Examples</a>
       <a href="#features">Features</a>
-      <a href="#installation">Install</a>
-      <a href="#endpoints">Endpoints</a>
-      <a href="#chaos">SRE Chaos</a>
+      <a href="#endpoints">REST & APIs</a>
       <a href="https://github.com/smford/onvif-camera-simulator" class="btn-github" target="_blank" rel="noopener">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
@@ -523,7 +657,7 @@
       <span>✨ 100% Pure Go &bull; Zero Cgo &bull; Zero FFmpeg</span>
     </div>
     <h1>ONVIF & RTSP Camera Simulator</h1>
-    <p>A high-performance mock camera platform for SREs, QA pipelines, and NVR developers testing Frigate, Home Assistant, Milestone, and Synology Surveillance.</p>
+    <p>A production-ready mock camera platform for SREs, QA automation pipelines, and NVR developers testing Frigate, Home Assistant, Milestone, and Synology Surveillance.</p>
 
     <div class="meta-badges">
       <span class="meta-badge">ONVIF Profile S/T/M</span>
@@ -532,139 +666,583 @@
       <span class="meta-badge">Virtual PTZ Kinematics</span>
       <span class="meta-badge">Pull-Point Events</span>
       <span class="meta-badge">Multi-Camera Fleet</span>
+      <span class="meta-badge">Current Release: <strong class="ver-str" style="color:var(--accent);">v0.2.0</strong></span>
     </div>
 
     <div class="hero-actions">
-      <a href="#installation" class="btn btn-primary">Get Started</a>
-      <a href="https://github.com/smford/onvif-camera-simulator" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+      <a href="#installation" class="btn btn-primary">Install Now</a>
+      <a href="#usage" class="btn btn-secondary">Explore Examples</a>
+      <a href="https://github.com/smford/onvif-camera-simulator" class="btn btn-secondary" target="_blank" rel="noopener">View Source</a>
+    </div>
+  </section>
+
+  <!-- Screenshots & TUI Demonstration -->
+  <section class="section" id="screenshots">
+    <div class="section-header">
+      <h2 class="section-title">Visual Showcase &amp; Terminal UI</h2>
+      <p class="section-subtitle">A zero-dependency Charm Bubble Tea interface providing real-time telemetry, PTZ kinematics, live log streaming, and SRE chaos controls.</p>
     </div>
 
-    <!-- Quick Terminal Install -->
-    <div class="terminal-box" id="installation">
-      <div class="terminal-header">
-        <div class="terminal-dots">
-          <div class="terminal-dot dot-red"></div>
-          <div class="terminal-dot dot-yellow"></div>
-          <div class="terminal-dot dot-green"></div>
+    <div class="screenshots-container">
+      <!-- Screenshot 1: Interactive TUI Dashboard -->
+      <div class="screenshot-card">
+        <div class="screenshot-media">
+          <img src="assets/tui-dashboard.svg" alt="ONVIF Camera Simulator Interactive TUI Dashboard" loading="lazy">
         </div>
-        <div class="terminal-title">quickstart.sh</div>
+        <div class="screenshot-desc">
+          <div>
+            <h3>🖥️ Interactive Bubble Tea TUI Dashboard</h3>
+            <p>Real-time terminal dashboard with live RTSP client sessions, pan/tilt/zoom gauge kinematics, event state toggles, and system telemetry across single or fleet camera topologies.</p>
+          </div>
+          <div>
+            <span class="meta-badge">Bubble Tea &bull; Lip Gloss</span>
+          </div>
+        </div>
       </div>
-      <div class="terminal-body">
-        <span class="comment"># Install via Homebrew Tap</span><br>
-        <span class="prompt">$</span> brew tap smford/tap<br>
-        <span class="prompt">$</span> brew install onvif-camera-simulator<br><br>
-        <span class="comment"># Run interactive TUI simulator</span><br>
-        <span class="prompt">$</span> onvif-camera-simulator<br><br>
-        <span class="comment"># Or run 4 cameras headless in background</span><br>
-        <span class="prompt">$</span> onvif-camera-simulator --no-tui --fleet 4
+
+      <!-- Screenshot 2: Real-Time Log Viewer -->
+      <div class="screenshot-card">
+        <div class="screenshot-media">
+          <img src="assets/tui-logs.svg" alt="TUI Real-Time Audit Log Ring Buffer" loading="lazy">
+        </div>
+        <div class="screenshot-desc">
+          <div>
+            <h3>📜 In-Terminal Live Telemetry &amp; Log Ring Buffer</h3>
+            <p>Instant inspection of WS-Discovery multicast probes, ONVIF SOAP requests, RTSP SETUP transactions, and chaos injections buffered up to 5,000 entries.</p>
+          </div>
+          <div>
+            <span class="meta-badge">Ring Buffer &bull; 5,000 Entries</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot 3: Architecture & Flow -->
+      <div class="screenshot-card">
+        <div class="screenshot-media">
+          <img src="assets/architecture.svg" alt="Pure Go Camera Simulator Architecture" loading="lazy">
+        </div>
+        <div class="screenshot-desc">
+          <div>
+            <h3>🏗️ High-Throughput Pure Go Architecture</h3>
+            <p>Built directly on <code>gortsplib/v4</code> and Go net stack with zero Cgo, emitting synchronized H.264 Baseline frames for immediate browser WebRTC and NVR compatibility.</p>
+          </div>
+          <div>
+            <span class="meta-badge">Zero Cgo &bull; gortsplib v4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot 4: Dynamic Snapshot HUD -->
+      <div class="screenshot-card">
+        <div class="screenshot-media">
+          <img src="assets/snapshot-hud.svg" alt="Simulated Snapshot with Dynamic HUD Overlays" loading="lazy">
+        </div>
+        <div class="screenshot-desc">
+          <div>
+            <h3>📸 Dynamic JPEG Snapshot Generator with HUD</h3>
+            <p>Real-time JPEG snapshots generated in memory featuring synchronized UTC timestamp, camera ID, PTZ coordinate status, and simulated AI detection bounding box overlays.</p>
+          </div>
+          <div>
+            <span class="meta-badge">Profile S/T/M &bull; JPEG Engine</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Features Grid -->
-  <section class="section" id="features">
-    <h2 class="section-title">Architected for NVR Stress Testing</h2>
-    <p class="section-subtitle">Everything needed to test streaming reliability, auto-discovery, PTZ movement, and AI event ingest under realistic conditions.</p>
+  <!-- Detailed Installation for All Platforms -->
+  <section class="section" id="installation">
+    <div class="section-header">
+      <h2 class="section-title">Cross-Platform Installation</h2>
+      <p class="section-subtitle">Native pre-compiled packages and container images available for macOS, Linux, Windows, and Docker.</p>
+    </div>
+
+    <div class="tabs-wrapper">
+      <div class="tabs-header" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchInstallTab(event, 'install-macos')">🍎 macOS</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchInstallTab(event, 'install-linux')">🐧 Linux (APT/RPM/APK/Arch)</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchInstallTab(event, 'install-windows')">🪟 Windows</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchInstallTab(event, 'install-docker')">🐳 Docker &amp; Compose</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchInstallTab(event, 'install-source')">🐹 Source &amp; Go Install</button>
+      </div>
+
+      <!-- macOS Tab -->
+      <div id="install-macos" class="tab-panel active">
+        <h3>Install on macOS (Apple Silicon &amp; Intel)</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">The easiest way to install and stay updated on macOS is via Homebrew Tap.</p>
+
+        <div class="code-box">
+          <div class="code-box-header">
+            <span>Homebrew Installation</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code><span class="comment"># Add tap and install simulator formula</span>
+<span class="prompt">$</span> brew tap smford/tap
+<span class="prompt">$</span> brew install onvif-camera-simulator
+
+<span class="comment"># Run interactive TUI simulator</span>
+<span class="prompt">$</span> onvif-camera-simulator --config config.yaml</code></pre>
+        </div>
+
+        <div class="distro-grid">
+          <div class="distro-card">
+            <h4>Apple Silicon (M1/M2/M3/M4)</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Direct binary tarball for ARM64 architecture:</p>
+            <div class="code-box">
+              <pre><code><span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_darwin_arm64.tar.gz
+<span class="prompt">$</span> tar -xzf onvif-camera-simulator_<span class="ver-num">0.2.0</span>_darwin_arm64.tar.gz
+<span class="prompt">$</span> sudo install -m 755 simulator /usr/local/bin/onvif-camera-simulator</code></pre>
+            </div>
+          </div>
+
+          <div class="distro-card">
+            <h4>Intel Mac (x86_64)</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Direct binary tarball for AMD64 architecture:</p>
+            <div class="code-box">
+              <pre><code><span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_darwin_amd64.tar.gz
+<span class="prompt">$</span> tar -xzf onvif-camera-simulator_<span class="ver-num">0.2.0</span>_darwin_amd64.tar.gz
+<span class="prompt">$</span> sudo install -m 755 simulator /usr/local/bin/onvif-camera-simulator</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Linux Tab -->
+      <div id="install-linux" class="tab-panel">
+        <h3>Install on Linux Distributions</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Native packaging includes systemd service unit, default configs, and clean uninstallation.</p>
+
+        <div class="distro-grid">
+          <!-- Debian / Ubuntu -->
+          <div class="distro-card">
+            <h4>Ubuntu, Debian, Raspberry Pi OS (.deb)</h4>
+            <div class="code-box">
+              <div class="code-box-header"><span>APT / DPKG (x86_64 or ARM64)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code><span class="comment"># For 64-bit x86_64:</span>
+<span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.deb
+<span class="prompt">$</span> sudo dpkg -i onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.deb
+
+<span class="comment"># For Raspberry Pi OS 64-bit / ARM64:</span>
+<span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_arm64.deb
+<span class="prompt">$</span> sudo dpkg -i onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_arm64.deb</code></pre>
+            </div>
+          </div>
+
+          <!-- Fedora / RHEL -->
+          <div class="distro-card">
+            <h4>Fedora, RHEL, CentOS, Rocky Linux (.rpm)</h4>
+            <div class="code-box">
+              <div class="code-box-header"><span>DNF / RPM</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code><span class="comment"># For x86_64:</span>
+<span class="prompt">$</span> sudo dnf install https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.rpm
+
+<span class="comment"># For ARM64:</span>
+<span class="prompt">$</span> sudo dnf install https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_arm64.rpm</code></pre>
+            </div>
+          </div>
+
+          <!-- Alpine Linux -->
+          <div class="distro-card">
+            <h4>Alpine Linux (.apk)</h4>
+            <div class="code-box">
+              <div class="code-box-header"><span>APK Package</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code><span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.apk
+<span class="prompt">$</span> apk add --allow-untrusted ./onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.apk</code></pre>
+            </div>
+          </div>
+
+          <!-- Arch Linux -->
+          <div class="distro-card">
+            <h4>Arch Linux, Manjaro (.pkg.tar.zst)</h4>
+            <div class="code-box">
+              <div class="code-box-header"><span>Pacman Package</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code><span class="prompt">$</span> curl -LO https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.pkg.tar.zst
+<span class="prompt">$</span> sudo pacman -U ./onvif-camera-simulator_<span class="ver-num">0.2.0</span>_linux_amd64.pkg.tar.zst</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <h4>Systemd Daemon Management</h4>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem;">Native packages automatically install a secure sandboxed systemd service (<code>/lib/systemd/system/onvif-camera-simulator.service</code>):</p>
+          <div class="code-box">
+            <pre><code><span class="comment"># Enable and start camera simulator daemon</span>
+<span class="prompt">$</span> sudo systemctl daemon-reload
+<span class="prompt">$</span> sudo systemctl enable --now onvif-camera-simulator
+
+<span class="comment"># Inspect service status and follow logs</span>
+<span class="prompt">$</span> sudo systemctl status onvif-camera-simulator
+<span class="prompt">$</span> sudo journalctl -u onvif-camera-simulator -f</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Windows Tab -->
+      <div id="install-windows" class="tab-panel">
+        <h3>Install on Windows (x86_64 &amp; ARM64)</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Standalone executable with full interactive TUI support inside Windows Terminal or PowerShell.</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>PowerShell Quickstart</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code><span class="comment"># Download and extract the latest Windows 64-bit release</span>
+<span class="prompt">PS&gt;</span> Invoke-WebRequest -Uri "https://github.com/smford/onvif-camera-simulator/releases/download/<span class="ver-str">v0.2.0</span>/onvif-camera-simulator_<span class="ver-num">0.2.0</span>_windows_amd64.zip" -OutFile "simulator.zip"
+<span class="prompt">PS&gt;</span> Expand-Archive simulator.zip -DestinationPath "C:\Tools\onvif-simulator"
+<span class="prompt">PS&gt;</span> cd "C:\Tools\onvif-simulator"
+
+<span class="comment"># Launch simulator in interactive TUI mode</span>
+<span class="prompt">PS&gt;</span> .\simulator.exe --config config.yaml
+
+<span class="comment"># Or run headless with 4 simulated cameras</span>
+<span class="prompt">PS&gt;</span> .\simulator.exe --no-tui --fleet 4</code></pre>
+        </div>
+      </div>
+
+      <!-- Docker Tab -->
+      <div id="install-docker" class="tab-panel">
+        <h3>Docker &amp; Container Deployments</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Multi-architecture images published to GitHub Container Registry (<code>ghcr.io</code>) for <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>Docker CLI (Host Networking Mode)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code><span class="comment"># Run container with host network mode for UDP WS-Discovery broadcast</span>
+<span class="prompt">$</span> docker run -d \
+    --name onvif-simulator \
+    --network host \
+    --restart unless-stopped \
+    -v "$(pwd)/config.yaml:/app/config.yaml:ro" \
+    ghcr.io/smford/onvif-camera-simulator:<span class="ver-str">v0.2.0</span> --no-tui</code></pre>
+        </div>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>docker-compose.yml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code>services:
+  onvif-simulator:
+    image: ghcr.io/smford/onvif-camera-simulator:<span class="ver-str">v0.2.0</span>
+    network_mode: host
+    restart: unless-stopped
+    command: ["--no-tui", "--fleet", "4"]
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro</code></pre>
+        </div>
+      </div>
+
+      <!-- Source Tab -->
+      <div id="install-source" class="tab-panel">
+        <h3>Build from Source</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Requires Go 1.23 or newer. Zero external dependencies or Cgo required.</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>Go Install &amp; Git Clone</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code><span class="comment"># Option 1: Install directly with 'go install'</span>
+<span class="prompt">$</span> go install github.com/smford/onvif-camera-simulator/cmd/simulator@latest
+
+<span class="comment"># Option 2: Clone repository and build with Makefile</span>
+<span class="prompt">$</span> git clone https://github.com/smford/onvif-camera-simulator.git
+<span class="prompt">$</span> cd onvif-camera-simulator
+<span class="prompt">$</span> make build
+<span class="prompt">$</span> ./bin/simulator --version</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detailed Usage & Examples -->
+  <section class="section" id="usage">
+    <div class="section-header">
+      <h2 class="section-title">Comprehensive Usage &amp; Integrations</h2>
+      <p class="section-subtitle">Real-world configurations for NVRs, VMS platforms, automated scenario testing, and SRE fault injection.</p>
+    </div>
+
+    <!-- Usage Tabs -->
+    <div class="tabs-wrapper">
+      <div class="tabs-header" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchUsageTab(event, 'usage-tui')">🕹️ TUI Keyboard Controls</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchUsageTab(event, 'usage-frigate')">📹 Frigate NVR &amp; go2rtc</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchUsageTab(event, 'usage-hass')">🏠 Home Assistant</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchUsageTab(event, 'usage-fleet')">🚀 Fleet Scaling (1..32 Cams)</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchUsageTab(event, 'usage-chaos')">⚡ SRE Chaos Scenarios</button>
+      </div>
+
+      <!-- Usage 1: TUI Controls -->
+      <div id="usage-tui" class="tab-panel active">
+        <h3>Interactive TUI Navigation</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Launch without flags to enter the interactive terminal user interface:</p>
+        <div class="code-box">
+          <pre><code><span class="prompt">$</span> onvif-camera-simulator --config config.yaml</code></pre>
+        </div>
+
+        <table class="key-table">
+          <thead>
+            <tr>
+              <th>KEYBINDING</th>
+              <th>ACTION</th>
+              <th>DESCRIPTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td>
+              <td>Switch Screens</td>
+              <td>Cycle between <code>[1] Dashboard</code>, <code>[2] Live Logs</code>, and <code>[3] Configuration</code></td>
+            </tr>
+            <tr>
+              <td><kbd>[</kbd> / <kbd>]</kbd></td>
+              <td>Camera Selection</td>
+              <td>Cycle active camera selection (cam0, cam1, ...) to view isolated telemetry</td>
+            </tr>
+            <tr>
+              <td><kbd>m</kbd></td>
+              <td>Toggle Motion Event</td>
+              <td>Trigger Profile S cell motion detector event in Pull-Point event broker</td>
+            </tr>
+            <tr>
+              <td><kbd>p</kbd></td>
+              <td>Toggle Person Event</td>
+              <td>Trigger Profile T/M AI person detection with normalized bounding boxes</td>
+            </tr>
+            <tr>
+              <td><kbd>v</kbd></td>
+              <td>Toggle Vehicle Event</td>
+              <td>Trigger Profile T/M AI vehicle detection event</td>
+            </tr>
+            <tr>
+              <td><kbd>f</kbd></td>
+              <td>Inject Stream Freeze</td>
+              <td>Pause RTP delivery on open RTSP sockets to test NVR reconnect timeouts</td>
+            </tr>
+            <tr>
+              <td><kbd>r</kbd></td>
+              <td>Inject Camera Reboot</td>
+              <td>Simulate hardware drop: closes TCP sessions, drops connections for duration</td>
+            </tr>
+            <tr>
+              <td><kbd>l</kbd></td>
+              <td>Inject Packet Loss</td>
+              <td>Drop 25% of synthetic RTP packets to test NVR video jitter handling</td>
+            </tr>
+            <tr>
+              <td><kbd>c</kbd></td>
+              <td>Clear All Chaos</td>
+              <td>Immediately restore normal streaming state across all cameras</td>
+            </tr>
+            <tr>
+              <td><kbd>q</kbd> / <kbd>Ctrl+C</kbd></td>
+              <td>Graceful Exit</td>
+              <td>Send WS-Discovery Bye notification and shut down RTSP listeners cleanly</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Usage 2: Frigate NVR -->
+      <div id="usage-frigate" class="tab-panel">
+        <h3>Frigate NVR &amp; go2rtc Configuration</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Frigate connects to the high-res 1080p stream for recording and uses the lightweight 360p sub-stream for AI object detection:</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>frigate/config.yml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code>mqtt:
+  enabled: false
+
+cameras:
+  simulator_cam0:
+    ffmpeg:
+      inputs:
+        # High-res 1080p stream for continuous recording
+        - path: rtsp://127.0.0.1:8554/live/cam0/main
+          roles:
+            - record
+        # Low-res 360p stream for motion &amp; AI object detection
+        - path: rtsp://127.0.0.1:8554/live/cam0/sub
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 360
+      fps: 10
+    record:
+      enabled: true
+    onvif:
+      host: 127.0.0.1
+      port: 8000
+      user: admin
+      password: admin
+
+go2rtc:
+  streams:
+    cam0_webrtc:
+      - rtsp://127.0.0.1:8554/live/cam0/main</code></pre>
+        </div>
+
+        <p style="margin-top:1rem; font-size:0.9rem; color:var(--text-muted);">Test the RTSP streams directly in your terminal with <code>ffplay</code> or <code>vlc</code>:</p>
+        <div class="code-box">
+          <pre><code><span class="comment"># Play Main Stream (1080p20)</span>
+<span class="prompt">$</span> ffplay -rtsp_transport tcp rtsp://127.0.0.1:8554/live/cam0/main
+
+<span class="comment"># Play Sub Stream (360p10)</span>
+<span class="prompt">$</span> ffplay -rtsp_transport tcp rtsp://127.0.0.1:8554/live/cam0/sub</code></pre>
+        </div>
+      </div>
+
+      <!-- Usage 3: Home Assistant -->
+      <div id="usage-hass" class="tab-panel">
+        <h3>Home Assistant Integration</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Home Assistant automatically discovers the simulator via WS-Discovery on your local subnet, or you can add it manually:</p>
+
+        <div class="distro-grid">
+          <div class="distro-card">
+            <h4>1. Automatic Discovery</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Ensure <code>--network host</code> or LAN deployment. Home Assistant will display an <strong>ONVIF Discovered</strong> notification automatically.</p>
+          </div>
+          <div class="distro-card">
+            <h4>2. Manual Configuration</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Navigate to <strong>Settings &rarr; Devices &amp; Services &rarr; Add Integration &rarr; ONVIF</strong>:</p>
+            <ul style="font-size:0.85rem; color:var(--text-muted); margin-left:1.25rem; margin-top:0.5rem;">
+              <li><strong>Host:</strong> <code>127.0.0.1</code> (or your server IP)</li>
+              <li><strong>Port:</strong> <code>8000</code></li>
+              <li><strong>Username:</strong> <code>admin</code></li>
+              <li><strong>Password:</strong> <code>admin</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code-box" style="margin-top:1.5rem;">
+          <div class="code-box-header"><span>Lovelace Picture Entity &amp; PTZ Card</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code>type: picture-glance
+title: Simulator Camera 0
+camera_image: camera.onvif_camera_simulator_cam0_main
+entities:
+  - binary_sensor.onvif_camera_simulator_cam0_motion
+  - binary_sensor.onvif_camera_simulator_cam0_person</code></pre>
+        </div>
+      </div>
+
+      <!-- Usage 4: Fleet Scaling -->
+      <div id="usage-fleet" class="tab-panel">
+        <h3>Multi-Camera Fleet Scaling</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Simulate an entire building or facility camera system (up to 32 independent cameras) on a single lightweight process:</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>Spinning up 8 Headless Cameras</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code><span class="prompt">$</span> onvif-camera-simulator --fleet 8 --no-tui</code></pre>
+        </div>
+
+        <p style="margin-top:1rem; font-size:0.9rem; color:var(--text-muted);">Each camera is cleanly namespaced across standard HTTP and RTSP ports:</p>
+        <table class="key-table">
+          <thead>
+            <tr>
+              <th>CAMERA ID</th>
+              <th>RTSP MAIN (1080p)</th>
+              <th>RTSP SUB (360p)</th>
+              <th>ONVIF SOAP SERVICE</th>
+              <th>DYNAMIC SNAPSHOT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>cam0</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/cam0/main</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/cam0/sub</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/cam0/device_service</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/cam0/snapshot</code></td>
+            </tr>
+            <tr>
+              <td><code>cam1</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/cam1/main</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/cam1/sub</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/cam1/device_service</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/cam1/snapshot</code></td>
+            </tr>
+            <tr>
+              <td><code>camN</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/camN/main</code></td>
+              <td><code>rtsp://127.0.0.1:8554/live/camN/sub</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/camN/device_service</code></td>
+              <td><code>http://127.0.0.1:8000/onvif/camN/snapshot</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Usage 5: SRE Chaos -->
+      <div id="usage-chaos" class="tab-panel">
+        <h3>SRE Chaos Engineering Suite</h3>
+        <p style="color:var(--text-muted); margin-top:0.5rem;">Trigger realistic camera failures programmatically to verify how your monitoring, alerting, and NVR failover pipelines react:</p>
+
+        <div class="code-box">
+          <div class="code-box-header"><span>REST API Fault Injection Examples</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><code><span class="comment"># 1. Inject a 5-second RTSP stream freeze (holds TCP connection without sending RTP packets)</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/inject \
+    -H "Content-Type: application/json" \
+    -d '{"type":"freeze", "duration":"5s", "camera":"cam0"}'
+
+<span class="comment"># 2. Simulate hardware reboot (closes connections, rejects reconnections for 15s)</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/inject \
+    -H "Content-Type: application/json" \
+    -d '{"type":"reboot", "duration":"15s", "camera":"cam0"}'
+
+<span class="comment"># 3. Simulate flaky network: 30% artificial packet loss for 20 seconds</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/inject \
+    -H "Content-Type: application/json" \
+    -d '{"type":"packet_loss", "percentage":30, "duration":"20s", "camera":"cam0"}'
+
+<span class="comment"># 4. Clear active chaos conditions immediately</span>
+<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/clear</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REST API & ONVIF Endpoints Reference -->
+  <section class="section" id="endpoints">
+    <div class="section-header">
+      <h2 class="section-title">REST APIs &amp; ONVIF Endpoints</h2>
+      <p class="section-subtitle">Programmatic control for CI/CD test automation and observability scraping.</p>
+    </div>
 
     <div class="grid-3">
       <div class="card">
-        <div class="card-icon icon-blue">🎥</div>
-        <h3>Pure Go Dual RTSP</h3>
-        <p>Built directly on <code>gortsplib/v4</code> and <code>mediacommon</code>. Emits synchronized 1080p Main and 360p Sub H.264 video with Constrained Baseline Profiles (<code>profile-level-id=42e01f</code>) for instant browser/WebRTC playback.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon icon-purple">🕹️</div>
-        <h3>Virtual PTZ Kinematics</h3>
-        <p>Real-time 20Hz continuous and absolute move motor simulation with acceleration clamping, velocity timeouts, and persistent preset coordination.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon icon-green">🔔</div>
-        <h3>WS-BaseNotification Events</h3>
-        <p>Pull-point event queue delivering cell motion (Profile S), AI person detection with normalized bounding boxes (Profile T/M), and vehicle detection to subscribed NVRs.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon icon-amber">⚡</div>
-        <h3>SRE Chaos Engineering</h3>
-        <p>Simulate production camera faults on-demand: stream freeze (holding RTSP TCP sockets without packet emission), connection drop / hardware reboot, and packet loss.</p>
-      </div>
-
-      <div class="card">
         <div class="card-icon icon-blue">🌐</div>
-        <h3>WS-Discovery Multicast</h3>
-        <p>Automatic device discovery on <code>239.255.255.250:3702</code> with Probe, ProbeMatch, Hello, and Bye notifications across single and fleet camera topologies.</p>
+        <h3>HTTP REST Endpoints</h3>
+        <p>Control events and inspect status via standard JSON REST calls:</p>
+        <ul style="font-size:0.85rem; color:var(--text-muted); margin-left:1.25rem; margin-top:0.5rem; line-height:1.7;">
+          <li><code>GET /api/status</code> &bull; General telemetry &amp; fleet health</li>
+          <li><code>GET /api/cameras</code> &bull; List active cameras &amp; mounts</li>
+          <li><code>GET /api/logs</code> &bull; Ring buffer log entries</li>
+          <li><code>POST /api/events/trigger</code> &bull; Fire motion/AI events</li>
+          <li><code>POST /api/chaos/inject</code> &bull; Trigger fault injection</li>
+          <li><code>POST /api/chaos/clear</code> &bull; Restore healthy streaming</li>
+        </ul>
       </div>
 
       <div class="card">
-        <div class="card-icon icon-purple">📊</div>
-        <h3>Interactive TUI & Observability</h3>
-        <p>Full Charm Bubble Tea dashboard with live telemetry, form config tuning, event log ring buffer, and Prometheus <code>/metrics</code> scraping.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Code Showcase & Usage -->
-  <section class="section" id="endpoints">
-    <h2 class="section-title">Configuration & REST APIs</h2>
-    <p class="section-subtitle">Flexible configuration and programmatic control for automated integration testing.</p>
-
-    <div class="showcase">
-      <div class="showcase-tabs">
-        <button class="tab-btn active" onclick="switchTab(event, 'tab-docker')">Docker Compose</button>
-        <button class="tab-btn" onclick="switchTab(event, 'tab-fleet')">Fleet Mode</button>
-        <button class="tab-btn" onclick="switchTab(event, 'tab-rest')">REST API & Chaos</button>
-        <button class="tab-btn" onclick="switchTab(event, 'tab-onvif')">ONVIF Endpoints</button>
+        <div class="card-icon icon-purple">📹</div>
+        <h3>ONVIF SOAP 1.2 Services</h3>
+        <p>Full ONVIF standard Profile S, T, and M compatibility:</p>
+        <ul style="font-size:0.85rem; color:var(--text-muted); margin-left:1.25rem; margin-top:0.5rem; line-height:1.7;">
+          <li><code>/onvif/device_service</code> &bull; Device capabilities &amp; reboot</li>
+          <li><code>/onvif/media_service</code> &bull; Profiles &amp; stream URIs</li>
+          <li><code>/onvif/ptz_service</code> &bull; ContinuousMove &amp; presets</li>
+          <li><code>/onvif/event_service</code> &bull; WS-BaseNotification</li>
+          <li><code>/onvif/snapshot</code> &bull; Dynamic JPEG frame generator</li>
+        </ul>
       </div>
 
-      <div id="tab-docker" class="tab-content active">
-<span class="comment"># docker-compose.yml</span>
-services:
-  onvif-simulator:
-    image: ghcr.io/smford/onvif-camera-simulator:latest
-    network_mode: host
-    restart: unless-stopped
-    command: ["--no-tui", "--config", "/app/config.yaml"]
-    volumes:
-      - ./config.yaml:/app/config.yaml:ro
-      </div>
-
-      <div id="tab-fleet" class="tab-content">
-<span class="comment"># Launch a fleet of 8 simulated cameras</span>
-<span class="prompt">$</span> onvif-camera-simulator --fleet 8 --no-tui
-
-<span class="comment"># Each camera is cleanly namespaced across shared ports:</span>
-RTSP Stream 0:  rtsp://127.0.0.1:8554/live/cam0/main
-RTSP Stream 1:  rtsp://127.0.0.1:8554/live/cam1/main
-ONVIF Service:  http://127.0.0.1:8000/onvif/cam0/device_service
-Dynamic JPEG:   http://127.0.0.1:8000/onvif/cam0/snapshot
-      </div>
-
-      <div id="tab-rest" class="tab-content">
-<span class="comment"># Trigger Cell Motion event via REST</span>
-<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/events/trigger \
-    -H "Content-Type: application/json" \
-    -d '{"topic":"motion", "state":true}'
-
-<span class="comment"># Inject 10s Simulated Reboot Chaos</span>
-<span class="prompt">$</span> curl -X POST http://127.0.0.1:8000/api/chaos/inject \
-    -H "Content-Type: application/json" \
-    -d '{"type":"reboot", "duration":"10s"}'
-
-<span class="comment"># Query active cameras and status</span>
-<span class="prompt">$</span> curl http://127.0.0.1:8000/api/cameras
-      </div>
-
-      <div id="tab-onvif" class="tab-content">
-<span class="comment"># ONVIF SOAP 1.2 Endpoints:</span>
-Device Service:  http://127.0.0.1:8000/onvif/device_service
-Media Service:   http://127.0.0.1:8000/onvif/media_service
-PTZ Service:     http://127.0.0.1:8000/onvif/ptz_service
-Event Service:   http://127.0.0.1:8000/onvif/event_service
-Dynamic JPEG:    http://127.0.0.1:8000/onvif/snapshot
-Health Check:    http://127.0.0.1:8000/healthz
-Prometheus:      http://127.0.0.1:8000/metrics
+      <div class="card">
+        <div class="card-icon icon-green">📊</div>
+        <h3>Health &amp; Prometheus Metrics</h3>
+        <p>Zero-configuration observability for Kubernetes and Prometheus:</p>
+        <ul style="font-size:0.85rem; color:var(--text-muted); margin-left:1.25rem; margin-top:0.5rem; line-height:1.7;">
+          <li><code>GET /healthz</code> &bull; Readiness &amp; liveness probe</li>
+          <li><code>GET /metrics</code> &bull; Prometheus metrics:
+            <ul style="margin-left:1rem; margin-top:0.25rem;">
+              <li><code>simulator_rtsp_clients_active</code></li>
+              <li><code>simulator_stream_bitrate_kbps</code></li>
+              <li><code>simulator_events_triggered_total</code></li>
+              <li><code>simulator_chaos_active</code></li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -672,20 +1250,93 @@ Prometheus:      http://127.0.0.1:8000/metrics
   <!-- Footer -->
   <footer>
     <p>Released under the <a href="https://github.com/smford/onvif-camera-simulator/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> &bull; Created by <a href="https://github.com/smford" target="_blank" rel="noopener">Simon Ford</a></p>
-    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;">Homebrew Tap: <code>brew install smford/tap/onvif-camera-simulator</code></p>
+    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #64748b;">
+      Homebrew: <code>brew install smford/tap/onvif-camera-simulator</code> &bull; 
+      Docker: <code>ghcr.io/smford/onvif-camera-simulator:<span class="ver-str">v0.2.0</span></code>
+    </p>
   </footer>
 
   <script>
-    function switchTab(evt, tabId) {
-      const contents = document.querySelectorAll('.tab-content');
-      contents.forEach(c => c.classList.remove('active'));
+    // Tab switching for Installation
+    function switchInstallTab(evt, tabId) {
+      const panel = document.getElementById(tabId);
+      const parentWrapper = panel.closest('.tabs-wrapper');
+      
+      parentWrapper.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      parentWrapper.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
 
-      const buttons = document.querySelectorAll('.tab-btn');
-      buttons.forEach(b => b.classList.remove('active'));
-
-      document.getElementById(tabId).classList.add('active');
+      panel.classList.add('active');
       evt.currentTarget.classList.add('active');
+      evt.currentTarget.setAttribute('aria-selected', 'true');
     }
+
+    // Tab switching for Usage
+    function switchUsageTab(evt, tabId) {
+      const panel = document.getElementById(tabId);
+      const parentWrapper = panel.closest('.tabs-wrapper');
+
+      parentWrapper.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      parentWrapper.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+
+      panel.classList.add('active');
+      evt.currentTarget.classList.add('active');
+      evt.currentTarget.setAttribute('aria-selected', 'true');
+    }
+
+    // Copy button helper
+    function copyCode(btn) {
+      const pre = btn.closest('.code-box').querySelector('code');
+      const text = pre.innerText.replace(/^\$ |^PS> /gm, '');
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = orig; }, 2000);
+      });
+    }
+
+    // Dynamic Live Version Checker:
+    // Fetches latest release tag from GitHub API asynchronously.
+    // If successful, gracefully updates all version references in real-time.
+    (function fetchLatestReleaseVersion() {
+      const repo = 'smford/onvif-camera-simulator';
+      fetch(`https://api.github.com/repos/${repo}/releases/latest`)
+        .then(response => {
+          if (!response.ok) return null;
+          return response.json();
+        })
+        .then(data => {
+          if (!data || !data.tag_name) return;
+          const latestTag = data.tag_name;
+          const semverNum = latestTag.replace(/^v/, '');
+
+          // Update header version banner
+          const versionEl = document.getElementById('release-version');
+          if (versionEl) versionEl.innerText = latestTag;
+
+          // Update release notes links
+          const releaseLink = document.getElementById('release-notes-link');
+          if (releaseLink) releaseLink.href = `https://github.com/${repo}/releases/tag/${latestTag}`;
+
+          // Update elements with class 'ver-str' (vX.Y.Z)
+          document.querySelectorAll('.ver-str').forEach(el => {
+            el.innerText = latestTag;
+          });
+
+          // Update elements with class 'ver-num' (X.Y.Z)
+          document.querySelectorAll('.ver-num').forEach(el => {
+            el.innerText = semverNum;
+          });
+        })
+        .catch(() => {
+          // Fall back gracefully to the embedded build version
+        });
+    })();
   </script>
 </body>
 </html>

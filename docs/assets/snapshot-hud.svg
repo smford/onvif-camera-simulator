@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&amp;display=swap');
+      .hud-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; fill: #22c55e; letter-spacing: 0.05em; }
+      .hud-warn { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #38bdf8; }
+      .hud-dim { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #64748b; }
+    </style>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a192f"/>
+      <stop offset="50%" stop-color="#112240"/>
+      <stop offset="100%" stop-color="#1e3a5f"/>
+    </linearGradient>
+    <radialGradient id="lensVignette" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.7"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background camera frame -->
+  <rect width="800" height="450" rx="8" fill="url(#skyGrad)"/>
+
+  <!-- Grid lines representing simulated perspective / test pattern -->
+  <g stroke="#1e293b" stroke-width="1" opacity="0.4">
+    <line x1="0" y1="150" x2="800" y2="150"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    <line x1="200" y1="0" x2="200" y2="450"/>
+    <line x1="400" y1="0" x2="400" y2="450"/>
+    <line x1="600" y1="0" x2="600" y2="450"/>
+  </g>
+
+  <!-- Moving test pattern object -->
+  <g transform="translate(480, 160)">
+    <!-- Bounding Box -->
+    <rect width="130" height="190" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="8 4"/>
+    <rect width="90" height="20" fill="#22c55e"/>
+    <text x="6" y="14" class="hud-text" font-size="11" fill="#052e16">PERSON 96%</text>
+
+    <!-- Synthetic silhouette representation -->
+    <circle cx="65" cy="45" r="22" fill="#22c55e" fill-opacity="0.3"/>
+    <rect x="42" y="72" width="46" height="75" rx="10" fill="#22c55e" fill-opacity="0.3"/>
+  </g>
+
+  <!-- Center PTZ Crosshair -->
+  <g transform="translate(400, 225)" stroke="#38bdf8" stroke-width="1.5" opacity="0.75">
+    <circle cx="0" cy="0" r="28" fill="none"/>
+    <line x1="-38" y1="0" x2="-8" y2="0"/>
+    <line x1="8" y1="0" x2="38" y2="0"/>
+    <line x1="0" y1="-38" x2="0" y2="-8"/>
+    <line x1="0" y1="8" x2="0" y2="38"/>
+  </g>
+
+  <!-- Lens Vignette -->
+  <rect width="800" height="450" rx="8" fill="url(#lensVignette)"/>
+
+  <!-- Camera HUD Overlays (Rendered by internal/onvif snapshot generator) -->
+  <g transform="translate(24, 32)">
+    <rect x="-8" y="-18" width="280" height="48" rx="4" fill="#000000" fill-opacity="0.6"/>
+    <text x="0" y="0" class="hud-text">CAM-0: ENTRANCE MAIN</text>
+    <text x="0" y="20" class="hud-text" font-size="12">2026-10-10 13:42:04.821 UTC</text>
+  </g>
+
+  <g transform="translate(560, 32)">
+    <rect x="-8" y="-18" width="220" height="48" rx="4" fill="#000000" fill-opacity="0.6"/>
+    <text x="0" y="0" class="hud-warn">CODEC: H.264 BASELINE</text>
+    <text x="0" y="20" class="hud-warn" font-size="12">1920x1080 @ 20.0 FPS</text>
+  </g>
+
+  <g transform="translate(24, 420)">
+    <rect x="-8" y="-18" width="340" height="30" rx="4" fill="#000000" fill-opacity="0.6"/>
+    <text x="0" y="0" class="hud-text">PTZ: P:+0.42 T:-0.15 Z:1.80x [MOVING]</text>
+  </g>
+
+  <g transform="translate(610, 420)">
+    <rect x="-8" y="-18" width="170" height="30" rx="4" fill="#000000" fill-opacity="0.6"/>
+    <text x="0" y="0" class="hud-text">ONVIF PROFILE S/T/M</text>
+  </g>
+</svg>

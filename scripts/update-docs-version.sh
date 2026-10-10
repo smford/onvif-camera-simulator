@@ -3,15 +3,18 @@ set -euo pipefail
 
 # scripts/update-docs-version.sh
 # Usage: ./scripts/update-docs-version.sh [VERSION] [DOCS_FILE]
-# Example: ./scripts/update-docs-version.sh v0.1.0 docs/index.html
+# Example: ./scripts/update-docs-version.sh v0.2.0 docs/index.html
 
 DOCS_FILE="${2:-docs/index.html}"
 VERSION="${1:-}"
 
-# If no version passed, resolve from git describe or latest tag
+# If no version passed, resolve from latest git tag
 if [ -z "$VERSION" ]; then
   if git rev-parse --git-dir > /dev/null 2>&1; then
-    VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    VERSION=$(git tag -l "v*.*.*" --sort=-v:refname 2>/dev/null | head -n 1 || true)
+    if [ -z "$VERSION" ]; then
+      VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    fi
   fi
 fi
 
@@ -46,14 +49,14 @@ original = content
 
 # 1. Replace <span id="release-version">...</span> or elements with class/id release-version
 content = re.sub(
-    r'(<span[^>]*id=["\']release-version["\'][^>]*>)[^<]*(</span>)',
+    r'(<(?:span|strong|code|div)[^>]*id=["\']release-version["\'][^>]*>)[^<]*(</(?:span|strong|code|div)>)',
     rf'\g<1>{version}\g<2>',
     content
 )
 
-# 2. Replace plain semver numbers in version badge or data attributes
+# 2. Replace plain semver numbers in class="release-version-number" or id="release-version-number"
 content = re.sub(
-    r'(<span[^>]*id=["\']release-version-number["\'][^>]*>)[^<]*(</span>)',
+    r'(<(?:span|strong|code)[^>]*(?:class|id)=["\'][^"\']*release-version-number[^"\']*["\'][^>]*>)[^<]*(</(?:span|strong|code)>)',
     rf'\g<1>{semver_num}\g<2>',
     content
 )
@@ -72,7 +75,7 @@ content = re.sub(
     content
 )
 
-# 5. Replace binary archive names: onvif-camera-simulator_X.Y.Z_...
+# 5. Replace binary archive & package names: onvif-camera-simulator_X.Y.Z_...
 content = re.sub(
     r'onvif-camera-simulator_[0-9]+\.[0-9]+\.[0-9]+_',
     f'onvif-camera-simulator_{semver_num}_',
@@ -83,6 +86,19 @@ content = re.sub(
 content = re.sub(
     r'onvif-camera-simulator:v[0-9]+\.[0-9]+\.[0-9]+',
     f'onvif-camera-simulator:{version}',
+    content
+)
+
+# 7. Update elements with data-version attribute or class="ver-str"
+content = re.sub(
+    r'(<(?:span|code)[^>]*class=["\'][^"\']*ver-str[^"\']*["\'][^>]*>)[^<]*(</(?:span|code)>)',
+    rf'\g<1>{version}\g<2>',
+    content
+)
+
+content = re.sub(
+    r'(<(?:span|code)[^>]*class=["\'][^"\']*ver-num[^"\']*["\'][^>]*>)[^<]*(</(?:span|code)>)',
+    rf'\g<1>{semver_num}\g<2>',
     content
 )
 

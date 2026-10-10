@@ -52,7 +52,7 @@ jobs:
           TARGET_TAG="${{ inputs.version || github.event.release.tag_name || github.event.inputs.version }}"
           if [ -z "$TARGET_TAG" ]; then
             git fetch --tags --force
-            TARGET_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+            TARGET_TAG=$(git tag -l "v*.*.*" --sort=-v:refname 2>/dev/null | head -n 1 || git describe --tags --abbrev=0 2>/dev/null || echo "v0.2.0")
           fi
 
           if [ -n "$TARGET_TAG" ]; then

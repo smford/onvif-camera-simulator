@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap');
+      .title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; fill: #ffffff; }
+      .box-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px; fill: #ffffff; }
+      .text { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #94a3b8; }
+      .text-light { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #e2e8f0; }
+      .pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
+    </style>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="480" rx="16" fill="#0b0f19" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Left Side: Protocols / Transports -->
+  <g transform="translate(40, 40)">
+    <text x="0" y="24" class="title" font-size="20">Network Transports</text>
+    <text x="0" y="44" class="text">100% Pure Go &bull; Zero External Cgo / FFmpeg</text>
+
+    <!-- Box 1: ONVIF SOAP 1.2 -->
+    <g transform="translate(0, 65)">
+      <rect width="260" height="95" rx="10" fill="url(#coreGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="16" y="28" class="box-title">HTTP &amp; ONVIF SOAP 1.2</text>
+      <text x="16" y="50" class="text-light">Port 8000 &bull; Profile S / T / M</text>
+      <text x="16" y="72" class="text">Device, Media, PTZ, Events</text>
+      <rect x="180" y="14" width="65" height="18" rx="4" fill="#0284c7" fill-opacity="0.3"/>
+      <text x="212" y="27" text-anchor="middle" class="pill" fill="#38bdf8">REST API</text>
+    </g>
+
+    <!-- Box 2: Dual RTSP -->
+    <g transform="translate(0, 180)">
+      <rect width="260" height="95" rx="10" fill="url(#coreGrad)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="16" y="28" class="box-title">Dual-Stream RTSP / RTP</text>
+      <text x="16" y="50" class="text-light">Port 8554 &bull; TCP / UDP</text>
+      <text x="16" y="72" class="text">1080p Main &amp; 360p Sub H.264</text>
+      <rect x="180" y="14" width="65" height="18" rx="4" fill="#4f46e5" fill-opacity="0.3"/>
+      <text x="212" y="27" text-anchor="middle" class="pill" fill="#a78bfa">H.264</text>
+    </g>
+
+    <!-- Box 3: WS-Discovery -->
+    <g transform="translate(0, 295)">
+      <rect width="260" height="95" rx="10" fill="url(#coreGrad)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="16" y="28" class="box-title">WS-Discovery Multicast</text>
+      <text x="16" y="50" class="text-light">239.255.255.250:3702 UDP</text>
+      <text x="16" y="72" class="text">ProbeMatch &amp; Hello/Bye Announce</text>
+      <rect x="180" y="14" width="65" height="18" rx="4" fill="#059669" fill-opacity="0.3"/>
+      <text x="212" y="27" text-anchor="middle" class="pill" fill="#34d399">UDP/MCAST</text>
+    </g>
+  </g>
+
+  <!-- Middle: Simulator Core Engine -->
+  <g transform="translate(370, 75)">
+    <rect width="270" height="355" rx="14" fill="#131b2e" stroke="#334155" stroke-width="1.5"/>
+    <rect width="270" height="42" rx="14" fill="#1e293b"/>
+    <line x1="0" y1="42" x2="270" y2="42" stroke="#334155"/>
+    <text x="135" y="26" text-anchor="middle" class="box-title" fill="#38bdf8">SIMULATOR ENGINE</text>
+
+    <!-- Submodules inside core -->
+    <g transform="translate(15, 60)">
+      <rect width="240" height="48" rx="6" fill="#0f172a" stroke="#1e293b"/>
+      <text x="12" y="22" class="box-title" font-size="12">Fleet Coordinator</text>
+      <text x="12" y="38" class="text" font-size="11">Scales 1..32 isolated cams</text>
+    </g>
+
+    <g transform="translate(15, 120)">
+      <rect width="240" height="48" rx="6" fill="#0f172a" stroke="#1e293b"/>
+      <text x="12" y="22" class="box-title" font-size="12">Virtual PTZ Kinematics</text>
+      <text x="12" y="38" class="text" font-size="11">20Hz physics &amp; motion clamping</text>
+    </g>
+
+    <g transform="translate(15, 180)">
+      <rect width="240" height="48" rx="6" fill="#0f172a" stroke="#1e293b"/>
+      <text x="12" y="22" class="box-title" font-size="12">Pull-Point Event Broker</text>
+      <text x="12" y="38" class="text" font-size="11">Cell motion, Person &amp; Vehicle AI</text>
+    </g>
+
+    <g transform="translate(15, 240)">
+      <rect width="240" height="48" rx="6" fill="#0f172a" stroke="#1e293b"/>
+      <text x="12" y="22" class="box-title" font-size="12">SRE Chaos Injection Engine</text>
+      <text x="12" y="38" class="text" font-size="11">Freeze, Reboot drop, Packet loss</text>
+    </g>
+  </g>
+
+  <!-- Right Side: Clients / Ecosystem -->
+  <g transform="translate(710, 40)">
+    <text x="0" y="24" class="title" font-size="20">Connected Ecosystem</text>
+    <text x="0" y="44" class="text">Tested &amp; Certified Integrations</text>
+
+    <!-- Client 1: Frigate NVR -->
+    <g transform="translate(0, 65)">
+      <rect width="250" height="75" rx="10" fill="url(#coreGrad)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="16" y="26" class="box-title">Frigate NVR</text>
+      <text x="16" y="46" class="text-light">Detect: 360p sub &bull; Record: 1080p</text>
+      <text x="16" y="62" class="text">go2rtc WebRTC restreaming</text>
+    </g>
+
+    <!-- Client 2: Home Assistant -->
+    <g transform="translate(0, 160)">
+      <rect width="250" height="75" rx="10" fill="url(#coreGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="16" y="26" class="box-title">Home Assistant</text>
+      <text x="16" y="46" class="text-light">Auto-discovery via WS-Discovery</text>
+      <text x="16" y="62" class="text">Native PTZ controls &amp; events</text>
+    </g>
+
+    <!-- Client 3: Commercial VMS -->
+    <g transform="translate(0, 255)">
+      <rect width="250" height="75" rx="10" fill="url(#coreGrad)" stroke="#10b981" stroke-width="1.5"/>
+      <text x="16" y="26" class="box-title">Synology &amp; Milestone</text>
+      <text x="16" y="46" class="text-light">ONVIF Profile S Compliance</text>
+      <text x="16" y="62" class="text">Continuous recording &amp; triggers</text>
+    </g>
+
+    <!-- Client 4: Prometheus & Grafana -->
+    <g transform="translate(0, 350)">
+      <rect width="250" height="75" rx="10" fill="url(#coreGrad)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="16" y="26" class="box-title">Prometheus / Observability</text>
+      <text x="16" y="46" class="text-light">Scrapes :8000/metrics</text>
+      <text x="16" y="62" class="text">Bitrate, FPS, RTSP sessions, faults</text>
+    </g>
+  </g>
+
+  <!-- Connecting Lines / Arrows -->
+  <path d="M 300 112 L 370 112" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 300 227 L 370 227" stroke="#818cf8" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 300 342 L 370 342" stroke="#34d399" stroke-width="2" stroke-dasharray="4 4"/>
+
+  <path d="M 640 160 L 710 102" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 640 210 L 710 197" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 640 260 L 710 292" stroke="#10b981" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 640 310 L 710 387" stroke="#818cf8" stroke-width="2" stroke-dasharray="4 4"/>
+</svg>
