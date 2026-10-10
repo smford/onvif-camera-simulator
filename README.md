@@ -143,6 +143,19 @@ curl -s -X POST http://127.0.0.1:8000/onvif/ptz_service \
 
 ## 📡 REST API & SRE Chaos Injection
 
+### Inspect System & Camera Status via REST
+
+```bash
+# Query overall system & chaos status
+curl -s http://127.0.0.1:8000/api/status
+
+# Query detailed per-camera telemetry (PTZ coordinates, active analytics events)
+curl -s http://127.0.0.1:8000/api/cameras
+
+# Query recent structured log entries from the ring buffer
+curl -s http://127.0.0.1:8000/api/logs
+```
+
 ### Trigger Events via REST
 
 ```bash

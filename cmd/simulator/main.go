@@ -141,7 +141,7 @@ func main() {
 	onvifServer = onvif.NewServer(cfg, hub, eventMgr)
 
 	// Attach REST API handler
-	apiHandler := api.NewAPIHandler(hub, eventMgr, chaosEng)
+	apiHandler := api.NewAPIHandler(hub, eventMgr, chaosEng, ringHandler)
 	onvifServer.SetAPIRoutes(func(mux *http.ServeMux) {
 		apiHandler.RegisterRoutes(mux)
 	})

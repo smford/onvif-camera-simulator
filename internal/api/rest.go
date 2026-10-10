@@ -31,17 +31,19 @@ type ChaosInjectRequest struct {
 
 // APIHandler wraps event and chaos triggers.
 type APIHandler struct {
-	hub      *telemetry.Hub
-	eventMgr *events.Manager
-	chaosEng *chaos.Engine
+	hub        *telemetry.Hub
+	eventMgr   *events.Manager
+	chaosEng   *chaos.Engine
+	logHandler *telemetry.RingBufferLogHandler
 }
 
 // NewAPIHandler creates the REST API controller.
-func NewAPIHandler(hub *telemetry.Hub, eventMgr *events.Manager, chaosEng *chaos.Engine) *APIHandler {
+func NewAPIHandler(hub *telemetry.Hub, eventMgr *events.Manager, chaosEng *chaos.Engine, logHandler *telemetry.RingBufferLogHandler) *APIHandler {
 	return &APIHandler{
-		hub:      hub,
-		eventMgr: eventMgr,
-		chaosEng: chaosEng,
+		hub:        hub,
+		eventMgr:   eventMgr,
+		chaosEng:   chaosEng,
+		logHandler: logHandler,
 	}
 }
 
@@ -50,8 +52,85 @@ func (h *APIHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/healthz", h.handleHealthz)
 	mux.HandleFunc("/readyz", h.handleReadyz)
 	mux.Handle("/metrics", metrics.Handler())
+	mux.HandleFunc("/api/status", h.handleStatus)
+	mux.HandleFunc("/api/cameras", h.handleCameras)
+	mux.HandleFunc("/api/logs", h.handleLogs)
 	mux.HandleFunc("/api/events/trigger", h.handleEventTrigger)
 	mux.HandleFunc("/api/chaos/inject", h.handleChaosInject)
+}
+
+func (h *APIHandler) handleLogs(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if h.logHandler == nil {
+		json.NewEncoder(w).Encode([]any{})
+		return
+	}
+	entries := h.logHandler.GetEntries()
+	json.NewEncoder(w).Encode(entries)
+}
+
+func (h *APIHandler) handleStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	activeClients, totalBitrate, fleetSize := h.hub.GetOverviewStats()
+	sessions := h.hub.GetSessions()
+
+	status := map[string]any{
+		"uptime_seconds": int(h.hub.Uptime().Seconds()),
+		"fleet_size":     fleetSize,
+		"active_clients": activeClients,
+		"total_bitrate":  totalBitrate,
+		"chaos": map[string]any{
+			"frozen":          h.hub.IsChaosFrozen(),
+			"rebooting":       h.hub.IsChaosReboot(),
+			"packet_loss_pct": h.hub.GetChaosLossPct(),
+		},
+		"sessions_count": len(sessions),
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(status)
+}
+
+func (h *APIHandler) handleCameras(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	_, _, fleetSize := h.hub.GetOverviewStats()
+	cams := make([]map[string]any, 0, fleetSize)
+	for i := 0; i < fleetSize; i++ {
+		camID := fmt.Sprintf("cam%d", i)
+		ptz := h.hub.GetPTZ(camID)
+		events := h.hub.GetEvents(camID)
+
+		camInfo := map[string]any{
+			"id": camID,
+			"ptz": map[string]any{
+				"pan":         ptz.Pan,
+				"tilt":        ptz.Tilt,
+				"zoom":        ptz.Zoom,
+				"move_status": ptz.MoveStatus,
+				"last_cmd":    ptz.LastCommand,
+			},
+			"events": map[string]any{
+				"motion_active":  events.MotionActive,
+				"human_active":   events.HumanActive,
+				"human_bbox":     events.HumanBBox,
+				"vehicle_active": events.VehicleActive,
+				"vehicle_bbox":   events.VehicleBBox,
+			},
+		}
+		cams = append(cams, camInfo)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cams)
 }
 
 func (h *APIHandler) handleHealthz(w http.ResponseWriter, r *http.Request) {
