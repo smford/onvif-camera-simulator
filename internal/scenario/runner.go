@@ -14,14 +14,14 @@ import (
 
 // Step defines an individual timed action in a test scenario playbook.
 type Step struct {
-	At              time.Duration `yaml:"at"`
-	Action          string        `yaml:"action"` // "event" or "chaos"
-	Camera          int           `yaml:"camera"` // camera index (0 -> cam0)
-	Type            string        `yaml:"type"`   // "motion", "human", "vehicle", "freeze", "reboot", "loss"
-	State           bool          `yaml:"state"`
-	BBox            [4]float64    `yaml:"bbox"` // [x, y, w, h]
-	Duration        time.Duration `yaml:"duration"`
-	LossPercentage  int           `yaml:"loss_percentage"`
+	At             time.Duration `yaml:"at"`
+	Action         string        `yaml:"action"` // "event" or "chaos"
+	Camera         int           `yaml:"camera"` // camera index (0 -> cam0)
+	Type           string        `yaml:"type"`   // "motion", "human", "vehicle", "freeze", "reboot", "loss"
+	State          bool          `yaml:"state"`
+	BBox           [4]float64    `yaml:"bbox"` // [x, y, w, h]
+	Duration       time.Duration `yaml:"duration"`
+	LossPercentage int           `yaml:"loss_percentage"`
 }
 
 // Playbook represents the top-level YAML structure.

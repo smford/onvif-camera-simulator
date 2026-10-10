@@ -16,13 +16,13 @@ import (
 
 // VirtualCamera encapsulates an individual simulated camera instance in the fleet.
 type VirtualCamera struct {
-	id     string
-	uuid   string
-	cfg    config.CameraConfig
-	ptz    *ptz.VirtualPTZ
-	hub    *telemetry.Hub
-	evMgr  *events.Manager
-	mac    string
+	id    string
+	uuid  string
+	cfg   config.CameraConfig
+	ptz   *ptz.VirtualPTZ
+	hub   *telemetry.Hub
+	evMgr *events.Manager
+	mac   string
 }
 
 func (vc *VirtualCamera) ID() string {

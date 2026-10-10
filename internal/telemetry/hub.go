@@ -80,16 +80,16 @@ func NewHub(fleetSize int) *Hub {
 		fleetSize = 1
 	}
 	h := &Hub{
-		startTime:    time.Now(),
-		fleetSize:    fleetSize,
-		sessions:     make(map[string]*ClientSession),
-		auditLimit:   10,
-		ptzStates:    make(map[string]*CameraPTZTelemetry),
-		eventStates:  make(map[string]*CameraEventTelemetry),
-		subscribers:  make(map[string]int),
-		eventsSent:   make(map[string]int),
-		mainFPS:      20.0,
-		subFPS:       10.0,
+		startTime:   time.Now(),
+		fleetSize:   fleetSize,
+		sessions:    make(map[string]*ClientSession),
+		auditLimit:  10,
+		ptzStates:   make(map[string]*CameraPTZTelemetry),
+		eventStates: make(map[string]*CameraEventTelemetry),
+		subscribers: make(map[string]int),
+		eventsSent:  make(map[string]int),
+		mainFPS:     20.0,
+		subFPS:      10.0,
 	}
 
 	for i := 0; i < fleetSize; i++ {
