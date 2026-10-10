@@ -983,52 +983,52 @@
             <tr>
               <td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td>
               <td>Switch Screens</td>
-              <td>Cycle between <code>[1] Dashboard</code>, <code>[2] Live Logs</code>, and <code>[3] Configuration</code></td>
+              <td>Cycle between <code>[1] Dashboard</code>, <code>[2] Configuration</code>, and <code>[3] Event Log</code></td>
+            </tr>
+            <tr>
+              <td><kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd></td>
+              <td>Jump to Screen</td>
+              <td>Jump directly to Tab 1 (Dashboard), Tab 2 (Configuration), or Tab 3 (Event Log)</td>
             </tr>
             <tr>
               <td><kbd>[</kbd> / <kbd>]</kbd></td>
               <td>Camera Selection</td>
-              <td>Cycle active camera selection (cam0, cam1, ...) to view isolated telemetry</td>
+              <td>Cycle active camera selection (cam0, cam1, ...) to inspect isolated telemetry</td>
             </tr>
             <tr>
               <td><kbd>m</kbd></td>
               <td>Toggle Motion Event</td>
-              <td>Trigger Profile S cell motion detector event in Pull-Point event broker</td>
+              <td>Toggle Profile S cell motion detector event in Pull-Point event broker</td>
             </tr>
             <tr>
-              <td><kbd>p</kbd></td>
-              <td>Toggle Person Event</td>
-              <td>Trigger Profile T/M AI person detection with normalized bounding boxes</td>
+              <td><kbd>h</kbd></td>
+              <td>Burst Human Detection</td>
+              <td>Emit 5-second Profile T/M AI human detection event with normalized bounding box</td>
             </tr>
             <tr>
               <td><kbd>v</kbd></td>
-              <td>Toggle Vehicle Event</td>
-              <td>Trigger Profile T/M AI vehicle detection event</td>
+              <td>Burst Vehicle Detection</td>
+              <td>Emit 5-second Profile T/M AI vehicle detection event with bounding box</td>
             </tr>
             <tr>
-              <td><kbd>f</kbd></td>
-              <td>Inject Stream Freeze</td>
-              <td>Pause RTP delivery on open RTSP sockets to test NVR reconnect timeouts</td>
+              <td><kbd>x</kbd></td>
+              <td>Toggle Stream Freeze</td>
+              <td>Pause RTP delivery on open RTSP sockets without closing TCP to test NVR reconnect timeouts</td>
             </tr>
             <tr>
-              <td><kbd>r</kbd></td>
-              <td>Inject Camera Reboot</td>
-              <td>Simulate hardware drop: closes TCP sessions, drops connections for duration</td>
+              <td><kbd>b</kbd></td>
+              <td>Simulate Hard Reboot</td>
+              <td>Drop active TCP sockets and reject connections for 5 seconds to test NVR backoff</td>
             </tr>
             <tr>
-              <td><kbd>l</kbd></td>
-              <td>Inject Packet Loss</td>
-              <td>Drop 25% of synthetic RTP packets to test NVR video jitter handling</td>
-            </tr>
-            <tr>
-              <td><kbd>c</kbd></td>
-              <td>Clear All Chaos</td>
-              <td>Immediately restore normal streaming state across all cameras</td>
+              <td><kbd>f</kbd> / <kbd>c</kbd></td>
+              <td>Log Controls (Tab 3)</td>
+              <td>Toggle log auto-scroll follow (<kbd>f</kbd>) or clear the ring buffer (<kbd>c</kbd>)</td>
             </tr>
             <tr>
               <td><kbd>q</kbd> / <kbd>Ctrl+C</kbd></td>
               <td>Graceful Exit</td>
-              <td>Send WS-Discovery Bye notification and shut down RTSP listeners cleanly</td>
+              <td>Send WS-Discovery Bye multicast notification and terminate gracefully</td>
             </tr>
           </tbody>
         </table>
@@ -1249,7 +1249,7 @@ entities:
 
   <!-- Footer -->
   <footer>
-    <p>Released under the <a href="https://github.com/smford/onvif-camera-simulator/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> &bull; Created by <a href="https://github.com/smford" target="_blank" rel="noopener">Simon Ford</a></p>
+    <p>Released under the <a href="https://github.com/smford/onvif-camera-simulator/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> &bull; Created by <a href="https://github.com/smford" target="_blank" rel="noopener">Stephen Ford</a></p>
     <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #64748b;">
       Homebrew: <code>brew install smford/tap/onvif-camera-simulator</code> &bull; 
       Docker: <code>ghcr.io/smford/onvif-camera-simulator:<span class="ver-str">v0.2.0</span></code>

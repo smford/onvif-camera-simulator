@@ -59,7 +59,7 @@ nfpms:
     package_name: onvif-camera-simulator
     vendor: smford
     homepage: https://github.com/smford/onvif-camera-simulator
-    maintainer: "Simon Ford <https://github.com/smford>"
+    maintainer: "Stephen Ford <https://github.com/smford>"
     description: "Pure Go ONVIF Profile S/T/M and RTSP camera simulator with virtual PTZ and fleet scaling"
     license: "MIT"
     formats:
