@@ -1,5 +1,6 @@
 # Binaries
 /simulator
+/bin/
 *.exe
 *.exe~
 *.dll
@@ -9,6 +10,7 @@
 # Test artifacts
 *.test
 *.out
+coverage.html
 
 # OS files
 .DS_Store

@@ -100,8 +100,43 @@ func (s *Server) Start() error {
 
 	udpConn := packetConn.(*net.UDPConn)
 	pConn := ipv4.NewPacketConn(udpConn)
-	if err := pConn.JoinGroup(iface, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
-		slog.Warn("Failed to join multicast group (multicast reception may be limited)", "err", err)
+	if iface != nil {
+		if err := pConn.JoinGroup(iface, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
+			slog.Warn("Failed to join multicast group", "interface", iface.Name, "err", err)
+		}
+	} else {
+		// On macOS/Darwin, JoinGroup(nil) returns EADDRNOTAVAIL ("can't assign requested address").
+		// Enumerate all active multicast-capable IPv4 interfaces and join each one.
+		joined := 0
+		if ifaces, err := net.Interfaces(); err == nil {
+			for _, ifi := range ifaces {
+				if ifi.Flags&net.FlagUp == 0 || ifi.Flags&net.FlagMulticast == 0 {
+					continue
+				}
+				addrs, err := ifi.Addrs()
+				if err != nil {
+					continue
+				}
+				hasIPv4 := false
+				for _, addr := range addrs {
+					if ipNet, ok := addr.(*net.IPNet); ok && ipNet.IP.To4() != nil {
+						hasIPv4 = true
+						break
+					}
+				}
+				if !hasIPv4 {
+					continue
+				}
+				if err := pConn.JoinGroup(&ifi, &net.UDPAddr{IP: mcastAddr.IP}); err == nil {
+					joined++
+				}
+			}
+		}
+		if joined == 0 {
+			if err := pConn.JoinGroup(nil, &net.UDPAddr{IP: mcastAddr.IP}); err != nil {
+				slog.Warn("Failed to join multicast group (multicast reception may be limited)", "err", err)
+			}
+		}
 	}
 
 	s.conn = udpConn
@@ -151,23 +186,29 @@ func (s *Server) listenLoop() {
 
 func (s *Server) handlePacket(packet []byte, srcAddr net.Addr) {
 	str := string(packet)
-	// Match WS-Discovery Probe
-	if !strings.Contains(str, ":Probe") && !strings.Contains(str, "Probe>") {
+
+	// Validate WS-Discovery Probe Action: http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe
+	if !strings.Contains(str, "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe") {
 		return
 	}
 
-	// Match Types: dn:NetworkVideoTransmitter or wildcard (empty or omitted)
-	isMatch := false
-	if !strings.Contains(str, "Types>") || strings.Contains(str, "NetworkVideoTransmitter") || strings.Contains(str, "Device") {
-		isMatch = true
-	}
-
-	if !isMatch {
-		return
+	// Validate Requested Types: TDS device (tds:Device or wildcard if Types is empty/omitted)
+	if strings.Contains(str, "Types>") {
+		typesContent := extractTagContent(str, "Types")
+		if typesContent != "" && !strings.Contains(typesContent, "tds:Device") && !strings.Contains(typesContent, "Device") {
+			return
+		}
 	}
 
 	msgID := extractMessageID(str)
+	if msgID == "" {
+		return
+	}
+
 	responseXML := s.buildProbeMatchResponse(msgID)
+	if responseXML == "" {
+		return
+	}
 
 	// Send ProbeMatch to the sender's unicast address
 	if _, err := s.conn.WriteTo([]byte(responseXML), srcAddr); err != nil {
@@ -197,23 +238,20 @@ func (s *Server) buildProbeMatchResponse(relatesToMsgID string) string {
 			xaddr = fmt.Sprintf("%s://%s:%d/onvif/%s/device_service", scheme, advIP, httpPort, c.ID())
 		}
 
-		matchesBuf.WriteString(fmt.Sprintf(`      <d:ProbeMatch>
-        <wsa:EndpointReference>
-          <wsa:Address>urn:uuid:%s</wsa:Address>
-        </wsa:EndpointReference>
-        <d:Types>dn:NetworkVideoTransmitter tds:Device</d:Types>
-        <d:Scopes>
-          onvif://www.onvif.org/type/video_encoder
-          onvif://www.onvif.org/type/ptz
-          onvif://www.onvif.org/type/audio
-          onvif://www.onvif.org/hardware/%s
-          onvif://www.onvif.org/name/%s
-          onvif://www.onvif.org/location/Default
-        </d:Scopes>
-        <d:XAddrs>%s</d:XAddrs>
-        <d:MetadataVersion>1</d:MetadataVersion>
-      </d:ProbeMatch>
-`, c.UUID(), c.Config().Model, c.ID(), xaddr))
+		camName := c.ID()
+		if c.Config().Model != "" {
+			camName = c.Config().Model
+		}
+
+		matchesBuf.WriteString(fmt.Sprintf(`      <ProbeMatch>
+        <EndpointReference>
+          <Address>urn:uuid:%s</Address>
+        </EndpointReference>
+        <Types>tds:Device dn:NetworkVideoTransmitter</Types>
+        <Scopes>onvif://www.onvif.org/type/video_encoder onvif://www.onvif.org/name/%s</Scopes>
+        <XAddrs>%s</XAddrs>
+      </ProbeMatch>
+`, c.UUID(), camName, xaddr))
 	}
 
 	newMsgID := "urn:uuid:" + uuid.New().String()
@@ -221,7 +259,7 @@ func (s *Server) buildProbeMatchResponse(relatesToMsgID string) string {
 	return fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-               xmlns:d="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns="http://schemas.xmlsoap.org/ws/2005/04/discovery"
                xmlns:dn="http://www.onvif.org/ver10/network/wsdl"
                xmlns:tds="http://www.onvif.org/ver10/device/wsdl">
   <soap:Header>
@@ -231,10 +269,32 @@ func (s *Server) buildProbeMatchResponse(relatesToMsgID string) string {
     <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/ProbeMatches</wsa:Action>
   </soap:Header>
   <soap:Body>
-    <d:ProbeMatches>
-%s    </d:ProbeMatches>
+    <ProbeMatches>
+%s    </ProbeMatches>
   </soap:Body>
 </soap:Envelope>`, newMsgID, relatesToMsgID, matchesBuf.String())
+}
+
+func extractTagContent(xmlStr, tag string) string {
+	openTag := "<" + tag
+	idx := strings.Index(xmlStr, openTag)
+	if idx == -1 {
+		// Try with namespace prefix e.g. <d:Types
+		openTag = ":" + tag
+		idx = strings.Index(xmlStr, openTag)
+	}
+	if idx != -1 {
+		rest := xmlStr[idx:]
+		gt := strings.Index(rest, ">")
+		if gt != -1 {
+			body := rest[gt+1:]
+			closeIdx := strings.Index(body, "</")
+			if closeIdx != -1 {
+				return strings.TrimSpace(body[:closeIdx])
+			}
+		}
+	}
+	return ""
 }
 
 func extractMessageID(reqXML string) string {
@@ -245,5 +305,5 @@ func extractMessageID(reqXML string) string {
 			return strings.TrimSpace(rest[:end])
 		}
 	}
-	return "urn:uuid:" + uuid.New().String()
+	return ""
 }
