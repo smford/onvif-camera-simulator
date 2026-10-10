@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&amp;display=swap');
-      .hud-mono { font-family: 'JetBrains Mono', monospace; font-size: 15px; fill: #ffffff; letter-spacing: 0.04em; }
-      .hud-label { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+      .hud-mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 15px; fill: #ffffff; letter-spacing: 0.04em; }
+      .hud-label { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; font-weight: 700; }
     </style>
   </defs>
 

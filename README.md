@@ -49,11 +49,19 @@ onvif-camera-simulator --no-tui --fleet 4
 
 ## 📸 Interactive Terminal UI (TUI)
 
+<p align="center">
+  <img src="docs/assets/tui-dashboard.svg" alt="Interactive TUI Dashboard" width="880">
+</p>
+
 The simulator includes a zero-dependency interactive dashboard built with Charm's `bubbletea` and `lipgloss`:
 
 - **Tab 1: Dashboard**: Live PTZ coordinate gauges, active RTSP client sessions table, event triggers, and SOAP audit trail.
 - **Tab 2: Configuration**: In-terminal configuration editor with hot-reload.
 - **Tab 3: Event Log**: Real-time color-coded syslog/event stream backed by a 250-record ring buffer.
+
+<p align="center">
+  <img src="docs/assets/tui-logs.svg" alt="Real-Time Event Log View" width="880">
+</p>
 
 ### Keyboard Shortcuts
 
@@ -149,6 +157,10 @@ ffplay -rtsp_transport tcp rtsp://127.0.0.1:8554/live/main
 # Fetch live stamped JPEG snapshot
 curl -o snapshot.jpg http://127.0.0.1:8000/onvif/snapshot
 ```
+
+<p align="center">
+  <img src="docs/assets/snapshot-hud.svg" alt="Live Camera Snapshot with PTZ Crosshair and AI Detection HUD" width="880">
+</p>
 
 ---
 

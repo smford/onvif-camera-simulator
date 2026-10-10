@@ -1,12 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap');
-      .title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; fill: #ffffff; }
-      .box-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px; fill: #ffffff; }
-      .text { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #94a3b8; }
-      .text-light { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #e2e8f0; }
-      .pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; }
+      .title { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 800; fill: #ffffff; }
+      .box-title { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 700; font-size: 14px; fill: #ffffff; }
+      .text { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; fill: #94a3b8; }
+      .text-light { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; fill: #e2e8f0; }
+      .pill { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; font-weight: 700; }
     </style>
     <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1e293b"/>
