@@ -14,7 +14,6 @@ import (
 	"github.com/smford/onvif-camera-simulator/internal/config"
 	"github.com/smford/onvif-camera-simulator/internal/fleet"
 	"golang.org/x/net/ipv4"
-	"golang.org/x/sys/unix"
 )
 
 // Server implements WS-Discovery (UDP Multicast 239.255.255.250:3702).
@@ -76,21 +75,10 @@ func (s *Server) Start() error {
 		}
 	}
 
-	// Socket configuration using SO_REUSEADDR and SO_REUSEPORT
+	// Socket configuration using SO_REUSEADDR and SO_REUSEPORT (cross-platform)
 	lc := net.ListenConfig{
 		Control: func(network, address string, c syscall.RawConn) error {
-			var opErr error
-			err := c.Control(func(fd uintptr) {
-				if err := unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEADDR, 1); err != nil {
-					opErr = err
-					return
-				}
-				_ = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
-			})
-			if err != nil {
-				return err
-			}
-			return opErr
+			return setReusePort(c)
 		},
 	}
 

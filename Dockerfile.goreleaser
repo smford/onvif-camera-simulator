@@ -1,0 +1,25 @@
+FROM alpine:3.21
+
+# Install CA certificates and tzdata for time synchronization
+RUN apk add --no-cache ca-certificates tzdata
+
+# Create non-root user and application directories
+RUN addgroup -g 10001 -S appgroup && \
+    adduser -u 10001 -S appuser -G appgroup && \
+    mkdir -p /app && \
+    chown -R appuser:appgroup /app
+
+ARG TARGETPLATFORM
+COPY ${TARGETPLATFORM}/simulator /app/simulator
+
+USER appuser
+WORKDIR /app
+
+# Expose ONVIF HTTP (8000), RTSP (8554), and UDP Multicast WS-Discovery (3702)
+EXPOSE 8000/tcp 8554/tcp 8554/udp 3702/udp
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget -q -O- http://127.0.0.1:8000/healthz || exit 1
+
+ENTRYPOINT ["/app/simulator"]
+CMD ["--no-tui", "--config", "/app/config.yaml"]

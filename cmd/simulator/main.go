@@ -27,7 +27,16 @@ import (
 	"golang.org/x/term"
 )
 
+var (
+	// Version, GitCommit, and BuildDate are populated during build via ldflags
+	Version   = "dev"
+	GitCommit = "none"
+	BuildDate = "unknown"
+)
+
 func main() {
+	versionFlag := flag.Bool("version", false, "Print version information and exit")
+	vFlag := flag.Bool("v", false, "Print version information and exit (shorthand)")
 	configPath := flag.String("config", "config.yaml", "Path to YAML configuration file")
 	initFlag := flag.Bool("init", false, "Generate a fully annotated config.yaml template and exit")
 	noTUIFlag := flag.Bool("no-tui", false, "Force headless mode without interactive TUI")
@@ -35,6 +44,12 @@ func main() {
 	scenarioPath := flag.String("scenario", "", "Path to scripted scenario playbook YAML for automated CI/CD runs")
 	logLevelFlag := flag.String("log-level", "", "Override logging level (debug, info, warn, error)")
 	flag.Parse()
+
+	// 0. Handle version flag
+	if *versionFlag || *vFlag {
+		fmt.Printf("onvif-camera-simulator version %s (commit: %s, built at: %s)\n", Version, GitCommit, BuildDate)
+		os.Exit(0)
+	}
 
 	// 1. Handle --init flag
 	if *initFlag {
@@ -100,7 +115,8 @@ func main() {
 	}
 
 	slog.Info("Starting ONVIF & RTSP Camera Simulator",
-		"version", "1.0.0",
+		"version", Version,
+		"commit", GitCommit,
 		"advertised_ip", cfg.Server.AdvertisedIP,
 		"http_port", cfg.Server.HTTPPort,
 		"rtsp_port", cfg.Server.RTSPPort,
