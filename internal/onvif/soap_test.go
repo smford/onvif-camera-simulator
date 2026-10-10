@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/smford/onvif-camera-simulator/internal/config"
+	"github.com/smford/onvif-camera-simulator/internal/telemetry"
 )
 
 func TestWSAuthenticatePasswordText(t *testing.T) {
@@ -132,5 +133,23 @@ func TestFormatSOAPFault(t *testing.T) {
 	}
 	if !strings.Contains(fault, "<soap:Value>wsse:FailedAuthentication</soap:Value>") {
 		t.Errorf("expected wsse:FailedAuthentication in Subcode, got %s", fault)
+	}
+}
+
+func TestGenerateSnapshot(t *testing.T) {
+	ev := telemetry.CameraEventTelemetry{
+		MotionActive: true,
+		HumanActive:  true,
+		HumanBBox:    [4]float64{0.1, 0.1, 0.3, 0.4},
+	}
+	jpegBytes, err := GenerateSnapshot("cam_test/0", 640, 360, 0.5, -0.5, 0.75, ev)
+	if err != nil {
+		t.Fatalf("GenerateSnapshot failed: %v", err)
+	}
+	if len(jpegBytes) < 100 {
+		t.Fatalf("snapshot output too small: %d bytes", len(jpegBytes))
+	}
+	if jpegBytes[0] != 0xFF || jpegBytes[1] != 0xD8 {
+		t.Fatalf("expected JPEG magic bytes 0xFF 0xD8, got %X %X", jpegBytes[0], jpegBytes[1])
 	}
 }

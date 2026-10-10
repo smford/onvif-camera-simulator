@@ -235,15 +235,15 @@ func (s *Server) handleONVIF(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSnapshot(w http.ResponseWriter, r *http.Request, cam CameraDelegate) {
-	var pan, tilt float64
+	var pan, tilt, zoom float64
 	var camID = "cam0"
 	if cam != nil {
 		camID = cam.ID()
-		pan, tilt, _, _, _ = cam.PTZ().GetStatus()
+		pan, tilt, zoom, _, _ = cam.PTZ().GetStatus()
 	}
 
 	ev := s.hub.GetEvents(camID)
-	data, err := GenerateSnapshot(camID, 1280, 720, pan, tilt, ev)
+	data, err := GenerateSnapshot(camID, 1280, 720, pan, tilt, zoom, ev)
 	if err != nil {
 		http.Error(w, "Failed to render snapshot: "+err.Error(), http.StatusInternalServerError)
 		return

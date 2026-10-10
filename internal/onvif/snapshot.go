@@ -20,7 +20,7 @@ var frameCounter uint64
 func GenerateSnapshot(
 	cameraID string,
 	width, height int,
-	pan, tilt float64,
+	pan, tilt, zoom float64,
 	ev telemetry.CameraEventTelemetry,
 ) ([]byte, error) {
 	if width <= 0 {
@@ -130,7 +130,7 @@ func GenerateSnapshot(
 	fillBox(img, 20, 20, 320, 60, color.RGBA{R: 10, G: 12, B: 18, A: 220})
 	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05.000 MST")
 	infoStr := fmt.Sprintf("%s | Frame #%d", cameraID, frameIdx)
-	ptzStr := fmt.Sprintf("PTZ: [%.2f, %.2f]", pan, tilt)
+	ptzStr := fmt.Sprintf("PTZ: [%.2f, %.2f, %.2f]", pan, tilt, zoom)
 
 	drawSimpleText(img, 30, 32, infoStr, textColor)
 	drawSimpleText(img, 30, 48, nowUTC, color.RGBA{R: 160, G: 220, B: 255, A: 255})
@@ -269,6 +269,16 @@ var font5x7 = map[byte][5]byte{
 	',': {0x00, 0x50, 0x30, 0x00, 0x00},
 	'#': {0x14, 0x7f, 0x14, 0x7f, 0x14},
 	'|': {0x00, 0x00, 0x7f, 0x00, 0x00},
+	'_': {0x40, 0x40, 0x40, 0x40, 0x40},
+	'/': {0x20, 0x10, 0x08, 0x04, 0x02},
+	'(': {0x00, 0x1c, 0x22, 0x41, 0x00},
+	')': {0x00, 0x41, 0x22, 0x1c, 0x00},
+	'%': {0x23, 0x13, 0x08, 0x64, 0x62},
+	'@': {0x32, 0x49, 0x79, 0x41, 0x3e},
+	'+': {0x08, 0x08, 0x3e, 0x08, 0x08},
+	'=': {0x14, 0x14, 0x14, 0x14, 0x14},
+	'!': {0x00, 0x00, 0x5f, 0x00, 0x00},
+	'?': {0x02, 0x01, 0x51, 0x09, 0x06},
 }
 
 func drawSimpleText(img *image.RGBA, startX, startY int, text string, c color.RGBA) {

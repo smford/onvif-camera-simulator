@@ -28,23 +28,25 @@ type StreamRoute struct {
 
 // Server encapsulates gortsplib RTSP server with authentication, telemetry, and stream routing.
 type Server struct {
-	cfg          *config.Config
-	hub          *telemetry.Hub
-	server       *gortsplib.Server
-	routes       map[string]*StreamRoute
-	mu           sync.RWMutex
-	nonce        string
-	rebootActive bool
-	activeConns  map[*gortsplib.ServerConn]struct{}
+	cfg             *config.Config
+	hub             *telemetry.Hub
+	server          *gortsplib.Server
+	routes          map[string]*StreamRoute
+	mu              sync.RWMutex
+	nonce           string
+	rebootActive    bool
+	activeConns     map[*gortsplib.ServerConn]struct{}
+	playingSessions map[*gortsplib.ServerSession]struct{}
 }
 
 // NewServer creates a new RTSP server instance.
 func NewServer(cfg *config.Config, hub *telemetry.Hub) *Server {
 	s := &Server{
-		cfg:         cfg,
-		hub:         hub,
-		routes:      make(map[string]*StreamRoute),
-		activeConns: make(map[*gortsplib.ServerConn]struct{}),
+		cfg:             cfg,
+		hub:             hub,
+		routes:          make(map[string]*StreamRoute),
+		activeConns:     make(map[*gortsplib.ServerConn]struct{}),
+		playingSessions: make(map[*gortsplib.ServerSession]struct{}),
 	}
 
 	n, _ := auth.GenerateNonce()
@@ -198,10 +200,17 @@ func (s *Server) OnSessionOpen(ctx *gortsplib.ServerHandlerOnSessionOpenCtx) {
 
 func (s *Server) OnSessionClose(ctx *gortsplib.ServerHandlerOnSessionCloseCtx) {
 	if ctx.Session != nil {
-		path := normalizePath(ctx.Session.SetuppedPath())
-		route := s.findRoute(path)
-		if route != nil {
-			metrics.ConnectedClients.WithLabelValues("rtsp", route.StreamType, route.Camera).Dec()
+		s.mu.Lock()
+		_, wasPlaying := s.playingSessions[ctx.Session]
+		delete(s.playingSessions, ctx.Session)
+		s.mu.Unlock()
+
+		if wasPlaying {
+			path := normalizePath(ctx.Session.SetuppedPath())
+			route := s.findRoute(path)
+			if route != nil {
+				metrics.ConnectedClients.WithLabelValues("rtsp", route.StreamType, route.Camera).Dec()
+			}
 		}
 	}
 }
@@ -258,6 +267,29 @@ func (s *Server) OnSetup(ctx *gortsplib.ServerHandlerOnSetupCtx) (*base.Response
 		return &base.Response{StatusCode: base.StatusServiceUnavailable}, nil, nil
 	}
 
+	// Authenticate if enabled
+	if s.cfg.Auth.Enabled {
+		if err := auth.Validate(
+			ctx.Request,
+			s.cfg.Auth.Username,
+			s.cfg.Auth.Password,
+			[]auth.ValidateMethod{auth.ValidateMethodDigestMD5, auth.ValidateMethodBasic},
+			"ONVIF-Camera-Simulator",
+			s.nonce,
+		); err != nil {
+			return &base.Response{
+				StatusCode: base.StatusUnauthorized,
+				Header: base.Header{
+					"WWW-Authenticate": auth.GenerateWWWAuthenticate(
+						[]auth.ValidateMethod{auth.ValidateMethodDigestMD5, auth.ValidateMethodBasic},
+						"ONVIF-Camera-Simulator",
+						s.nonce,
+					),
+				},
+			}, nil, nil
+		}
+	}
+
 	path := normalizePath(ctx.Path)
 	route := s.findRoute(path)
 	if route == nil {
@@ -282,7 +314,12 @@ func (s *Server) OnPlay(ctx *gortsplib.ServerHandlerOnPlayCtx) (*base.Response, 
 	if route != nil {
 		remote := ctx.Conn.NetConn().RemoteAddr().String()
 		s.hub.UpdateSessionPath(remote, route.Camera, route.StreamType, "TCP", "PLAY")
-		metrics.ConnectedClients.WithLabelValues("rtsp", route.StreamType, route.Camera).Inc()
+		s.mu.Lock()
+		if _, alreadyPlaying := s.playingSessions[ctx.Session]; !alreadyPlaying {
+			s.playingSessions[ctx.Session] = struct{}{}
+			metrics.ConnectedClients.WithLabelValues("rtsp", route.StreamType, route.Camera).Inc()
+		}
+		s.mu.Unlock()
 	}
 
 	return &base.Response{
